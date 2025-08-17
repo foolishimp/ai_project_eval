@@ -1,0 +1,12 @@
+
+# Claude task management
+*.backup
+CLAUDE.md.backup
+
+# Test Dashboard Module (from test_dd_dashboard)
+test_dd_dashboard/node_modules/
+test_dd_dashboard/package-lock.json
+test_dd_dashboard/test-registry.json
+test_dd_dashboard/project-config.json
+test_dd_dashboard/*.log
+test-registry.json

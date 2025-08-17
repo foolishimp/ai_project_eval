@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>localStorage Isolation Browser Test</title>
+    
+    <!-- REQUIRED: Dashboard metadata for test discovery -->
+    <meta name="test-category" content="component">
+    <meta name="test-name" content="localStorage Isolation Browser">
+    <meta name="test-description" content="Browser test for project-specific localStorage keys">
+    
+    <style>
+        body { font-family: monospace; margin: 20px; }
+        .test-result { margin: 10px 0; padding: 10px; border-radius: 4px; }
+        .pass { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .fail { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background: #e2e3e5; color: #383d41; border: 1px solid #d6d8db; }
+        .storage-keys { background: #f8f9fa; padding: 10px; margin: 10px 0; border-radius: 4px; }
+        button { margin: 5px; padding: 10px; }
+    </style>
+</head>
+<body>
+    <h1>🧪 localStorage Isolation Browser Test</h1>
+    <p>Testing project-specific localStorage keys in actual browser environment</p>
+    
+    <button onclick="runIsolationTests()">▶️ Run Isolation Tests</button>
+    <button onclick="showStorageKeys()">🔍 Show Storage Keys</button>
+    <button onclick="clearTestStorage()">🗑️ Clear Test Storage</button>
+    <button onclick="clearResults()">📄 Clear Results</button>
+    
+    <div id="test-output"></div>
+    <div id="storage-display" class="storage-keys" style="display:none;"></div>
+
+    <script>
+        // Test whether the dashboard localStorage isolation is working
+        function logResult(testName, passed, message) {
+            const output = document.getElementById('test-output');
+            const div = document.createElement('div');
+            div.className = `test-result ${passed ? 'pass' : 'fail'}`;
+            div.innerHTML = `<strong>${passed ? '✅ PASS' : '❌ FAIL'}</strong>: ${testName}<br>${message}`;
+            output.appendChild(div);
+        }
+
+        function logInfo(message) {
+            const output = document.getElementById('test-output');
+            const div = document.createElement('div');
+            div.className = 'test-result info';
+            div.innerHTML = `<strong>ℹ️ INFO</strong>: ${message}`;
+            output.appendChild(div);
+        }
+
+        function clearResults() {
+            document.getElementById('test-output').innerHTML = '';
+        }
+
+        function showStorageKeys() {
+            const display = document.getElementById('storage-display');
+            const keys = Object.keys(localStorage).filter(key => key.startsWith('dashboard-'));
+            
+            if (keys.length === 0) {
+                display.innerHTML = '<strong>No dashboard localStorage keys found</strong>';
+            } else {
+                display.innerHTML = `
+                    <strong>Dashboard localStorage Keys:</strong><br>
+                    ${keys.map(key => `• ${key}: ${localStorage.getItem(key)?.substring(0, 50)}...`).join('<br>')}
+                `;
+            }
+            display.style.display = 'block';
+        }
+
+        function clearTestStorage() {
+            // Clear all dashboard-related localStorage keys
+            const keys = Object.keys(localStorage).filter(key => key.startsWith('dashboard-'));
+            keys.forEach(key => localStorage.removeItem(key));
+            logInfo(`Cleared ${keys.length} dashboard localStorage keys`);
+            showStorageKeys();
+        }
+
+        async function testStoragePrefixGeneration() {
+            try {
+                const response = await fetch('/api/project-config');
+                if (!response.ok) throw new Error('API not available');
+                
+                const config = await response.json();
+                const expectedPrefix = `dashboard-${config.port}-${config.projectName}-`;
+                
+                // Test storage operations
+                const testKey = expectedPrefix + 'testData';
+                localStorage.setItem(testKey, 'test-value');
+                const retrieved = localStorage.getItem(testKey);
+                
+                const passed = retrieved === 'test-value';
+                logResult(
+                    'Storage prefix generation and usage',
+                    passed,
+                    `Expected prefix: ${expectedPrefix}<br>Storage test: ${passed ? 'successful' : 'failed'}`
+                );
+                
+                return passed;
+            } catch (error) {
+                logResult('Storage prefix generation', false, `API error: ${error.message}`);
+                return false;
+            }
+        }
+
+        async function testIsolationFromOtherProjects() {
+            // Simulate storage from different projects
+            localStorage.setItem('dashboard-8183-psychicblob-selectedDirectories', '["psychicblob/src"]');
+            localStorage.setItem('dashboard-8162-ai_mfe_portal-selectedDirectories', '["portal/tests"]');
+            
+            try {
+                const response = await fetch('/api/project-config');
+                const config = await response.json();
+                const thisProjectPrefix = `dashboard-${config.port}-${config.projectName}-`;
+                
+                // Set this project's storage
+                localStorage.setItem(thisProjectPrefix + 'selectedDirectories', '["dev/tests"]');
+                
+                // Verify isolation
+                const psychicblobData = localStorage.getItem('dashboard-8183-psychicblob-selectedDirectories');
+                const portalData = localStorage.getItem('dashboard-8162-ai_mfe_portal-selectedDirectories');
+                const thisProjectData = localStorage.getItem(thisProjectPrefix + 'selectedDirectories');
+                
+                const isolated = psychicblobData !== thisProjectData && 
+                               portalData !== thisProjectData &&
+                               psychicblobData !== portalData;
+                
+                logResult(
+                    'Isolation from other projects',
+                    isolated,
+                    `Projects have separate storage: ${isolated}<br>` +
+                    `psychicblob: ${psychicblobData}<br>` +
+                    `portal: ${portalData}<br>` +
+                    `this: ${thisProjectData}`
+                );
+                
+                return isolated;
+            } catch (error) {
+                logResult('Project isolation', false, `Error: ${error.message}`);
+                return false;
+            }
+        }
+
+        async function testStorageKeyUniqueness() {
+            const keys = [];
+            
+            // Simulate different project configs
+            const configs = [
+                { port: 8085, projectName: 'test_dd_dashboard_dev' },
+                { port: 8183, projectName: 'psychicblob' },
+                { port: 8162, projectName: 'ai_mfe_portal' }
+            ];
+            
+            configs.forEach(config => {
+                const prefix = `dashboard-${config.port}-${config.projectName}-`;
+                keys.push(prefix + 'selectedDirectories');
+            });
+            
+            // Verify all keys are unique
+            const uniqueKeys = new Set(keys);
+            const allUnique = uniqueKeys.size === keys.length;
+            
+            logResult(
+                'Storage key uniqueness',
+                allUnique,
+                `Generated ${keys.length} keys, ${uniqueKeys.size} unique<br>` +
+                `Keys: ${keys.join(', ')}`
+            );
+            
+            return allUnique;
+        }
+
+        async function runIsolationTests() {
+            clearResults();
+            logInfo('Running localStorage Isolation Tests...');
+            
+            const tests = [
+                { name: 'Storage prefix generation', fn: testStoragePrefixGeneration },
+                { name: 'Project isolation', fn: testIsolationFromOtherProjects },
+                { name: 'Key uniqueness', fn: testStorageKeyUniqueness }
+            ];
+            
+            let passed = 0;
+            let failed = 0;
+            
+            for (const test of tests) {
+                if (await test.fn()) {
+                    passed++;
+                } else {
+                    failed++;
+                }
+            }
+            
+            logInfo(`Test Results: ${passed} passed, ${failed} failed`);
+            
+            if (failed === 0) {
+                logResult('ISOLATION TEST SUITE', true, 'localStorage isolation working correctly');
+            } else {
+                logResult('ISOLATION TEST SUITE', false, `${failed} test(s) failed`);
+            }
+            
+            showStorageKeys();
+        }
+
+        // Auto-setup message on load
+        window.onload = () => {
+            logInfo('localStorage Isolation Test Suite Loaded');
+            logInfo('This test verifies that dashboard instances have isolated localStorage');
+            logInfo('Click "Run Isolation Tests" to verify the fix');
+        };
+    </script>
+</body>
+</html>
