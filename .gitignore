@@ -10,3 +10,11 @@ test_dd_dashboard/test-registry.json
 test_dd_dashboard/project-config.json
 test_dd_dashboard/*.log
 test-registry.json
+
+# Claude task management
+*.backup
+CLAUDE.md.backup
+
+# Claude task management
+*.backup
+CLAUDE.md.backup

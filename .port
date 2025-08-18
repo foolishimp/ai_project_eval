@@ -1,0 +1,10 @@
+{
+  "port": 8102,
+  "pid": 30900,
+  "startTime": "2025-08-18T15:38:50.212Z",
+  "urls": {
+    "dashboard": "http://localhost:8102/dashboard",
+    "api": "http://localhost:8102/api/projects",
+    "health": "http://localhost:8102/api/health"
+  }
+}

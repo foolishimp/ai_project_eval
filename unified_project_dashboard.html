@@ -1,0 +1,2375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Project Management Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+            background: linear-gradient(135deg, #0a0a0f 0%, #151521 25%, #1a1a2e 75%, #0a0a0f 100%);
+            color: #e2e8f0;
+            line-height: 1.5;
+            min-height: 100vh;
+            overflow-x: hidden;
+            font-weight: 400;
+            letter-spacing: -0.01em;
+        }
+
+        /* Unified Header */
+        .unified-header {
+            background: linear-gradient(135deg, #0f1419 0%, #1e293b 50%, #0f172a 100%);
+            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+            padding: 24px 32px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(20px);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header-title h1 {
+            color: #64748b;
+            font-size: 1.75rem;
+            font-weight: 600;
+            margin: 0;
+            letter-spacing: -0.025em;
+        }
+
+        .header-subtitle {
+            font-size: 13px;
+            color: #94a3b8;
+            font-weight: 400;
+            margin-top: 2px;
+        }
+
+        /* Tab Navigation */
+        .tab-navigation {
+            display: flex;
+            gap: 2px;
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 12px;
+            padding: 6px;
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            backdrop-filter: blur(20px);
+        }
+
+        .tab-button {
+            background: transparent;
+            border: none;
+            color: #94a3b8;
+            padding: 14px 28px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+            letter-spacing: -0.01em;
+        }
+
+        .tab-button:hover {
+            color: #e2e8f0;
+            background: rgba(148, 163, 184, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .tab-button.active {
+            background: rgba(148, 163, 184, 0.15);
+            color: #f8fafc;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(148, 163, 184, 0.2);
+        }
+
+        /* Main Container */
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0;
+            min-height: calc(100vh - 120px);
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+            width: 100%;
+            height: calc(100vh - 120px);
+            overflow: hidden;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Project Builder Tab Styles */
+        .builder-container {
+            display: flex;
+            height: 100%;
+            background: linear-gradient(135deg, #1e293b 0%, #334155 25%, #1e293b 75%, #0f172a 100%);
+        }
+
+        .builder-sidebar {
+            width: 320px;
+            background: linear-gradient(180deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.9) 100%);
+            border-right: 1px solid rgba(148, 163, 184, 0.1);
+            padding: 24px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            backdrop-filter: blur(20px);
+        }
+
+        .builder-main {
+            flex: 1;
+            padding: 32px;
+            overflow-y: auto;
+            background: rgba(15, 23, 42, 0.3);
+        }
+
+        /* Portfolio Analytics Tab Styles */
+        .analytics-container {
+            padding: 24px;
+            height: 100%;
+            overflow-y: auto;
+            background: linear-gradient(135deg, #1e293b 0%, #334155 25%, #475569 75%, #1e293b 100%);
+        }
+
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 20px;
+            height: calc(100vh - 160px);
+        }
+
+        .analytics-sidebar {
+            background: linear-gradient(180deg, rgba(30, 41, 59, 0.9) 0%, rgba(51, 65, 85, 0.8) 100%);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-radius: 16px;
+            padding: 24px;
+            height: fit-content;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            overflow-y: auto;
+            max-height: calc(100vh - 200px);
+            backdrop-filter: blur(20px);
+        }
+
+        .analytics-main {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Analytics Sidebar Controls */
+        .control-section {
+            margin-bottom: 25px;
+        }
+
+        .control-section h3 {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #cbd5e1;
+            border-bottom: 1px solid rgba(203, 213, 225, 0.3);
+            padding-bottom: 10px;
+            letter-spacing: -0.01em;
+        }
+
+        .filter-group {
+            margin-bottom: 15px;
+        }
+
+        .filter-checkbox {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            padding: 8px;
+            border-radius: 6px;
+            transition: background-color 0.2s;
+        }
+
+        .filter-checkbox:hover {
+            background-color: rgba(148, 163, 184, 0.1);
+        }
+
+        .filter-checkbox input[type="checkbox"] {
+            margin-right: 10px;
+            accent-color: #94a3b8;
+        }
+
+        .filter-checkbox span {
+            font-size: 13px;
+            color: #e2e8f0;
+        }
+
+        .priority-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
+        .priority-1 { background: linear-gradient(135deg, #059669, #047857); color: white; box-shadow: 0 2px 8px rgba(5, 150, 105, 0.3); }
+        .priority-2 { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3); }
+        .priority-3 { background: linear-gradient(135deg, #d97706, #b45309); color: white; box-shadow: 0 2px 8px rgba(217, 119, 6, 0.3); }
+        .priority-4 { background: linear-gradient(135deg, #dc2626, #b91c1c); color: white; box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3); }
+
+        /* Portfolio Project List */
+        .portfolio-project-list {
+            background: linear-gradient(180deg, rgba(30, 41, 59, 0.6) 0%, rgba(51, 65, 85, 0.4) 100%);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-radius: 16px;
+            padding: 28px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .project-list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 18px;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+        }
+
+        .sort-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .sort-controls select {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(148, 163, 184, 0.3);
+            border-radius: 8px;
+            padding: 10px 14px;
+            color: #e2e8f0;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .portfolio-project-item {
+            background: rgba(30, 41, 59, 0.4);
+            border: 1px solid rgba(148, 163, 184, 0.15);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 16px;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+
+        .portfolio-project-item:hover {
+            background: rgba(148, 163, 184, 0.15);
+            border-color: rgba(148, 163, 184, 0.4);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .portfolio-project-item.active {
+            border-color: #94a3b8;
+            background: rgba(148, 163, 184, 0.2);
+            box-shadow: 0 8px 32px rgba(148, 163, 184, 0.4);
+        }
+
+        .portfolio-project-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .portfolio-project-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #f8fafc;
+            margin-bottom: 6px;
+            letter-spacing: -0.01em;
+        }
+
+        .portfolio-project-meta {
+            font-size: 12px;
+            color: #cbd5e1;
+        }
+
+        .portfolio-project-scores {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .portfolio-score-item {
+            text-align: center;
+        }
+
+        .portfolio-score-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #cbd5e1;
+        }
+
+        .portfolio-score-label {
+            font-size: 11px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+        }
+
+        .portfolio-project-description {
+            font-size: 14px;
+            color: #e2e8f0;
+            line-height: 1.5;
+            margin-bottom: 14px;
+        }
+
+        .portfolio-project-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .portfolio-tag {
+            background: rgba(148, 163, 184, 0.2);
+            color: #cbd5e1;
+            padding: 6px 10px;
+            border-radius: 14px;
+            font-size: 11px;
+            font-weight: 500;
+            border: 1px solid rgba(148, 163, 184, 0.3);
+        }
+
+        .portfolio-tag.strategy { background: rgba(59, 130, 246, 0.2); color: #93c5fd; border-color: rgba(59, 130, 246, 0.3); }
+        .portfolio-tag.category { background: rgba(168, 85, 247, 0.2); color: #c4b5fd; border-color: rgba(168, 85, 247, 0.3); }
+
+        /* Tooltip */
+        .tooltip {
+            position: absolute;
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.9));
+            color: #e2e8f0;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 12px;
+            pointer-events: none;
+            z-index: 100;
+            border: 1px solid rgba(148, 163, 184, 0.3);
+            backdrop-filter: blur(20px);
+            max-width: 280px;
+            display: none;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+
+        .tooltip h4 {
+            margin-bottom: 8px;
+            color: #94a3b8;
+            font-weight: 600;
+        }
+
+        /* Project Details Modal (from original portfolio) */
+        .project-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .project-modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.9));
+            border: 1px solid rgba(148, 163, 184, 0.3);
+            border-radius: 20px;
+            width: 90%;
+            max-width: 900px;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 40px;
+            position: relative;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.6);
+            animation: slideIn 0.3s ease-out;
+            backdrop-filter: blur(20px);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: #999;
+            font-size: 24px;
+            cursor: pointer;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .modal-close:hover {
+            color: #ff4444;
+            background: rgba(255, 68, 68, 0.1);
+        }
+
+        .modal-header {
+            border-bottom: 2px solid #333;
+            padding-bottom: 20px;
+            margin-bottom: 25px;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            color: #94a3b8;
+            margin-bottom: 12px;
+            line-height: 1.3;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+
+        .modal-meta {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            font-size: 14px;
+            color: #999;
+        }
+
+        .modal-body {
+            color: #e0e0e0;
+            line-height: 1.6;
+        }
+
+        .modal-body h2, .modal-body h3 {
+            color: #94a3b8;
+            margin-top: 32px;
+            margin-bottom: 16px;
+            font-weight: 600;
+        }
+
+        .modal-body h2 {
+            font-size: 20px;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.3);
+            padding-bottom: 10px;
+        }
+
+        .modal-body h3 {
+            font-size: 16px;
+        }
+
+        .modal-body p {
+            margin-bottom: 15px;
+        }
+
+        .modal-body strong {
+            color: #fff;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from { 
+                opacity: 0;
+                transform: translateY(-50px) scale(0.95);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Shared Styles */
+        .section-title {
+            font-size: 18px;
+            color: #64748b;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+            padding-bottom: 12px;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, rgba(148, 163, 184, 0.2), rgba(100, 116, 139, 0.3));
+            color: #e2e8f0;
+            border: 1px solid rgba(148, 163, 184, 0.4);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, rgba(148, 163, 184, 0.3), rgba(100, 116, 139, 0.4));
+            border-color: rgba(148, 163, 184, 0.6);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(30, 41, 59, 0.6);
+            color: #cbd5e1;
+            border: 1px solid rgba(148, 163, 184, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(30, 41, 59, 0.8);
+            border-color: rgba(148, 163, 184, 0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Project List Container */
+        #projectsList {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            width: 100%;
+        }
+
+        /* Project List Styles */
+        .project-item {
+            background: rgba(30, 41, 59, 0.4);
+            border: 1px solid rgba(148, 163, 184, 0.15);
+            border-radius: 12px;
+            margin-bottom: 10px;
+            overflow: hidden;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            width: 100%;
+            display: block;
+        }
+
+        .project-item:hover {
+            border-color: rgba(148, 163, 184, 0.4);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .project-item.active {
+            border-color: #94a3b8;
+            background: rgba(148, 163, 184, 0.15);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+        }
+
+        .project-header {
+            padding: 15px;
+            display: block;
+            width: 100%;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .project-header:hover {
+            background: rgba(148, 163, 184, 0.1);
+        }
+
+        .project-icon {
+            font-size: 14px;
+            margin-right: 8px;
+        }
+
+        .project-status {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            white-space: nowrap;
+            display: inline-block;
+        }
+
+        .status-portfolio { background: rgba(0, 255, 136, 0.8); color: white; }
+        .status-draft { background: #6c757d; color: white; }
+        .status-evaluated { background: #17a2b8; color: white; }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #94a3b8;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid rgba(148, 163, 184, 0.3);
+            border-radius: 10px;
+            background: rgba(15, 23, 42, 0.6);
+            color: #e2e8f0;
+            font-size: 14px;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 400;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: rgba(148, 163, 184, 0.6);
+            box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.1), 0 4px 12px rgba(0, 0, 0, 0.2);
+            background: rgba(15, 23, 42, 0.8);
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        /* Tab Content Specific Styling */
+        .tab-workspace {
+            background: linear-gradient(180deg, rgba(15, 23, 42, 0.6) 0%, rgba(30, 41, 59, 0.4) 100%);
+            border-radius: 16px;
+            padding: 36px;
+            margin: 24px;
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Risk/Value Matrix from Portfolio */
+        .risk-value-matrix {
+            position: relative;
+            width: 100%;
+            height: 450px;
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(51, 65, 85, 0.6) 50%, rgba(71, 85, 105, 0.4) 100%);
+            border-radius: 16px;
+            border: 1px solid rgba(148, 163, 184, 0.3);
+            margin: 24px 0;
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.3), 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        .project-dot {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 2px solid white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .project-dot:hover {
+            transform: scale(1.5);
+            border-width: 3px;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+
+        .project-dot.priority-1 { background-color: #22c55e; }
+        .project-dot.priority-2 { background-color: #3b82f6; }
+        .project-dot.priority-3 { background-color: #f59e0b; }
+        .project-dot.priority-4 { background-color: #ef4444; }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .analytics-grid {
+                grid-template-columns: 250px 1fr;
+            }
+            
+            .builder-sidebar {
+                width: 250px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .analytics-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .builder-container {
+                flex-direction: column;
+            }
+            
+            .builder-sidebar {
+                width: 100%;
+                height: auto;
+            }
+
+            .tab-navigation {
+                flex-direction: column;
+                gap: 4px;
+            }
+
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+
+        /* Loading States */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            color: #94a3b8;
+            font-weight: 500;
+        }
+
+        .loading::before {
+            content: '';
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(148, 163, 184, 0.3);
+            border-top: 2px solid #94a3b8;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 12px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Unified Header -->
+    <header class="unified-header">
+        <div class="header-content">
+            <div class="header-title">
+                <h1>⚡ AI Project Dashboard</h1>
+                <div class="header-subtitle">Enterprise Project Management & Analytics Platform</div>
+            </div>
+            
+            <nav class="tab-navigation">
+                <button class="tab-button active" onclick="switchMainTab('builder')" id="tab-builder">
+                    <span>⚙️</span> Project Builder
+                </button>
+                <button class="tab-button" onclick="switchMainTab('evaluation')" id="tab-evaluation">
+                    <span>🔬</span> Evaluation
+                </button>
+                <button class="tab-button" onclick="switchMainTab('analytics')" id="tab-analytics">
+                    <span>📈</span> Portfolio Analytics
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Project Builder Tab -->
+        <div class="tab-content active" id="content-builder">
+            <div class="builder-container">
+                <div class="builder-sidebar">
+                    <div class="control-section">
+                        <h3>Projects</h3>
+                        <button class="btn btn-primary" onclick="createNewProject()" style="width: 100%; margin-bottom: 15px;">
+                            <span>➕</span> New Project
+                        </button>
+                        
+                        <div style="margin-bottom: 15px;">
+                            <div class="filter-checkbox">
+                                <input type="checkbox" id="hide-examples">
+                                <span style="font-size: 12px; color: #94a3b8;">Hide Examples</span>
+                            </div>
+                        </div>
+                        
+                        <div class="project-list-header" style="margin-bottom: 15px;">
+                            <div class="sort-controls" style="width: 100%; justify-content: center;">
+                                <label for="builder-sort-by" style="color: #94a3b8; margin-right: 8px; font-weight: 500;">Sort:</label>
+                                <select id="builder-sort-by" style="flex: 1;">
+                                    <option value="date">Date Created</option>
+                                    <option value="name">Project Name</option>
+                                    <option value="score">Final Score</option>
+                                    <option value="priority">Priority Level</option>
+                                    <option value="source">Source Type</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="projectsList">
+                        <div class="loading">Loading projects...</div>
+                    </div>
+                </div>
+                
+                <div class="builder-main">
+                    <div class="tab-workspace">
+                        <h2 style="color: #94a3b8; margin-bottom: 24px; font-weight: 600;">Project Details</h2>
+                        
+                        <div class="form-group">
+                            <label for="projectName">Project Name</label>
+                            <input type="text" id="projectName" placeholder="Enter project name">
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <div class="form-group">
+                                <label for="submitter">Submitter</label>
+                                <input type="text" id="submitter" placeholder="Your name">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="department">Department</label>
+                                <input type="text" id="department" placeholder="Department/Team">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="description">Executive Summary</label>
+                            <textarea id="description" placeholder="Describe your AI project proposal..."></textarea>
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <div class="form-group">
+                                <label for="category">Solution Category</label>
+                                <select id="category">
+                                    <option value="">Select category</option>
+                                    <option value="Content Generation">Content Generation</option>
+                                    <option value="Classification">Classification & Analysis</option>
+                                    <option value="Search & Retrieval">Search & Retrieval</option>
+                                    <option value="Data Extraction">Data Extraction</option>
+                                    <option value="Conversational">Conversational AI</option>
+                                    <option value="Code & Technical">Code & Technical</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="strategy">Implementation Strategy</label>
+                                <select id="strategy">
+                                    <option value="">Select strategy</option>
+                                    <option value="Strategy 1: Direct Prompting">Direct Prompting</option>
+                                    <option value="Strategy 2: Formalized Assets">Formalized Assets</option>
+                                    <option value="Strategy 3: Live Production">Live Production</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; gap: 15px; margin-top: 30px;">
+                            <button class="btn btn-primary" onclick="saveProject()">
+                                <span>💾</span> Save Project
+                            </button>
+                            <button class="btn btn-primary" onclick="saveToPortfolio()">
+                                <span>📊</span> Save to Portfolio
+                            </button>
+                            <button class="btn btn-secondary" onclick="exportProject()">
+                                <span>📤</span> Export
+                            </button>
+                        </div>
+                        
+                        <!-- Quick Evaluation Section -->
+                        <div style="margin-top: 40px; padding-top: 30px; border-top: 1px solid rgba(148, 163, 184, 0.2);">
+                            <h3 style="color: #94a3b8; margin-bottom: 20px; font-weight: 600;">⚡ Quick Evaluation</h3>
+                            <p style="color: #94a3b8; margin-bottom: 25px; font-size: 14px;">Complete this optional evaluation to generate immediate scoring and priority assessment for your project.</p>
+                            
+                            <!-- Evaluation Criteria Grid -->
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px;">
+                                <!-- Business Value Factors -->
+                                <div>
+                                    <h4 style="color: #cbd5e1; font-size: 15px; margin-bottom: 15px; font-weight: 600;">📈 Business Value</h4>
+                                    
+                                    <div class="form-group" style="margin-bottom: 15px;">
+                                        <label for="revenueImpact">Revenue Impact Potential</label>
+                                        <select id="revenueImpact">
+                                            <option value="">Select impact level</option>
+                                            <option value="5">Very High (>$1M annually)</option>
+                                            <option value="4">High ($500K-$1M annually)</option>
+                                            <option value="3">Medium ($100K-$500K annually)</option>
+                                            <option value="2">Low ($10K-$100K annually)</option>
+                                            <option value="1">Minimal (<$10K annually)</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="form-group" style="margin-bottom: 15px;">
+                                        <label for="timeToValue">Time to Realize Value</label>
+                                        <select id="timeToValue">
+                                            <option value="">Select timeframe</option>
+                                            <option value="5">Immediate (0-3 months)</option>
+                                            <option value="4">Short-term (3-6 months)</option>
+                                            <option value="3">Medium-term (6-12 months)</option>
+                                            <option value="2">Long-term (1-2 years)</option>
+                                            <option value="1">Very long-term (>2 years)</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="strategicAlignment">Strategic Alignment</label>
+                                        <select id="strategicAlignment">
+                                            <option value="">Select alignment level</option>
+                                            <option value="5">Critical to core strategy</option>
+                                            <option value="4">Strongly aligned</option>
+                                            <option value="3">Moderately aligned</option>
+                                            <option value="2">Somewhat aligned</option>
+                                            <option value="1">Minimally aligned</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <!-- Risk Factors -->
+                                <div>
+                                    <h4 style="color: #cbd5e1; font-size: 15px; margin-bottom: 15px; font-weight: 600;">⚠️ Risk Assessment</h4>
+                                    
+                                    <div class="form-group" style="margin-bottom: 15px;">
+                                        <label for="technicalComplexity">Technical Complexity</label>
+                                        <select id="technicalComplexity">
+                                            <option value="">Select complexity level</option>
+                                            <option value="1">Very Low (simple prompting)</option>
+                                            <option value="2">Low (basic integration)</option>
+                                            <option value="3">Medium (moderate customization)</option>
+                                            <option value="4">High (significant development)</option>
+                                            <option value="5">Very High (cutting-edge research)</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="form-group" style="margin-bottom: 15px;">
+                                        <label for="dataAvailability">Data Quality & Availability</label>
+                                        <select id="dataAvailability">
+                                            <option value="">Select data status</option>
+                                            <option value="1">Excellent (clean, accessible)</option>
+                                            <option value="2">Good (mostly clean)</option>
+                                            <option value="3">Fair (some cleaning needed)</option>
+                                            <option value="4">Poor (significant work needed)</option>
+                                            <option value="5">Critical (major data issues)</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="resourceRequirements">Resource Requirements</label>
+                                        <select id="resourceRequirements">
+                                            <option value="">Select resource level</option>
+                                            <option value="1">Minimal (1-2 people part-time)</option>
+                                            <option value="2">Low (1-2 people full-time)</option>
+                                            <option value="3">Medium (3-5 people)</option>
+                                            <option value="4">High (6-10 people)</option>
+                                            <option value="5">Very High (>10 people)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Evaluation Results -->
+                            <div id="evaluationResults" style="display: none; margin-top: 25px; padding: 20px; background: rgba(30, 41, 59, 0.6); border-radius: 12px; border: 1px solid rgba(148, 163, 184, 0.2);">
+                                <h4 style="color: #cbd5e1; margin-bottom: 15px; font-weight: 600;">📊 Evaluation Results</h4>
+                                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; text-align: center;">
+                                    <div>
+                                        <div style="font-size: 24px; font-weight: 700; color: #94a3b8;" id="valueScore">-</div>
+                                        <div style="font-size: 12px; color: #94a3b8; text-transform: uppercase;">Value Score</div>
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 24px; font-weight: 700; color: #94a3b8;" id="riskScore">-</div>
+                                        <div style="font-size: 12px; color: #94a3b8; text-transform: uppercase;">Risk Score</div>
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 24px; font-weight: 700; color: #94a3b8;" id="finalScore">-</div>
+                                        <div style="font-size: 12px; color: #94a3b8; text-transform: uppercase;">Final Score</div>
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 24px; font-weight: 700;" id="priorityLevel">-</div>
+                                        <div style="font-size: 12px; color: #94a3b8; text-transform: uppercase;">Priority</div>
+                                    </div>
+                                </div>
+                                <div style="margin-top: 15px; padding: 15px; background: rgba(0, 0, 0, 0.3); border-radius: 8px;">
+                                    <div style="font-weight: 600; color: #cbd5e1; margin-bottom: 8px;">Recommendation:</div>
+                                    <div style="color: #e2e8f0; font-size: 14px;" id="recommendation">Complete the evaluation criteria above to receive a recommendation.</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Evaluation Actions -->
+                            <div style="display: flex; gap: 15px; margin-top: 20px;">
+                                <button class="btn btn-primary" onclick="calculateEvaluation()">
+                                    <span>🔬</span> Calculate Evaluation
+                                </button>
+                                <button class="btn btn-secondary" onclick="clearEvaluation()">
+                                    <span>🗑️</span> Clear Evaluation
+                                </button>
+                                <button class="btn btn-secondary" onclick="applyEvaluationToProject()" id="applyEvalBtn" style="display: none;">
+                                    <span>✅</span> Apply to Project
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Evaluation Tab -->
+        <div class="tab-content" id="content-evaluation">
+            <div class="analytics-container" style="background: linear-gradient(135deg, #334155 0%, #475569 25%, #64748b 75%, #334155 100%);">
+                <div class="tab-workspace" style="background: linear-gradient(180deg, rgba(51, 65, 85, 0.6) 0%, rgba(71, 85, 105, 0.4) 100%); border-color: rgba(148, 163, 184, 0.2);">
+                    <h2 style="color: #cbd5e1; margin-bottom: 20px; font-weight: 600;">Project Creation Hub</h2>
+                    <p style="color: #e2e8f0; margin-bottom: 30px;">Multiple ways to create and evaluate AI project proposals</p>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; margin-top: 40px;">
+                        <!-- Interactive Builder -->
+                        <div class="creation-method">
+                            <div style="background: rgba(100, 116, 139, 0.15); border: 2px solid rgba(148, 163, 184, 0.3); border-radius: 16px; padding: 28px; text-align: center; backdrop-filter: blur(20px);">
+                                <h3 style="color: #94a3b8; margin-bottom: 15px; font-weight: 600;">📝 Interactive Builder</h3>
+                                <p style="color: #e2e8f0; margin-bottom: 20px; line-height: 1.5;">Use the guided Project Builder tab to create comprehensive project proposals with structured forms and real-time evaluation.</p>
+                                <button class="btn btn-primary" onclick="switchMainTab('builder')" style="width: 100%;">
+                                    <span>🚀</span> Start Building
+                                </button>
+                            </div>
+                        </div>
+
+
+                        <!-- Claude Code Commands -->
+                        <div class="creation-method">
+                            <div style="background: rgba(120, 113, 108, 0.15); border: 2px solid rgba(168, 162, 158, 0.3); border-radius: 16px; padding: 28px; text-align: center; backdrop-filter: blur(20px);">
+                                <h3 style="color: #a8a29e; margin-bottom: 15px; font-weight: 600;">🤖 Claude Code Commands</h3>
+                                <p style="color: #e2e8f0; margin-bottom: 20px; line-height: 1.5;">Use AI-assisted project creation and evaluation through Claude Code CLI commands for expert guidance.</p>
+                                <div style="background: rgba(0, 0, 0, 0.4); padding: 18px; border-radius: 12px; margin-bottom: 18px; border: 1px solid rgba(120, 113, 108, 0.3);">
+                                    <code style="color: #a8a29e; font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace; font-weight: 500;">
+                                        /prepare<br>
+                                        /eval project.md
+                                    </code>
+                                </div>
+                                <button class="btn btn-secondary" onclick="copyCommands()" style="width: 100%; background: rgba(120, 113, 108, 0.2); border-color: rgba(168, 162, 158, 0.3); color: #a8a29e;">
+                                    <span>📋</span> Copy Commands
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Python Calculator -->
+                        <div class="creation-method">
+                            <div style="background: rgba(20, 184, 166, 0.1); border: 2px solid rgba(45, 212, 191, 0.25); border-radius: 16px; padding: 28px; text-align: center; backdrop-filter: blur(20px);">
+                                <h3 style="color: #5eead4; margin-bottom: 15px; font-weight: 600;">🐍 Python Calculator</h3>
+                                <p style="color: #e2e8f0; margin-bottom: 20px; line-height: 1.5;">Use the algorithmic scoring calculator for deterministic, reproducible project evaluations.</p>
+                                <div style="background: rgba(0, 0, 0, 0.4); padding: 18px; border-radius: 12px; margin-bottom: 18px; border: 1px solid rgba(20, 184, 166, 0.3);">
+                                    <code style="color: #5eead4; font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace; font-weight: 500;">
+                                        python scoring_calculator.py
+                                    </code>
+                                </div>
+                                <button class="btn btn-secondary" onclick="showPythonInstructions()" style="width: 100%; background: rgba(20, 184, 166, 0.15); border-color: rgba(45, 212, 191, 0.3); color: #5eead4;">
+                                    <span>🔧</span> View Instructions
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Rule-Based Matrix -->
+                        <div class="creation-method">
+                            <div style="background: rgba(99, 102, 241, 0.1); border: 2px solid rgba(129, 140, 248, 0.25); border-radius: 16px; padding: 28px; text-align: center; backdrop-filter: blur(20px);">
+                                <h3 style="color: #a5b4fc; margin-bottom: 15px; font-weight: 600;">📊 Rule-Based Matrix</h3>
+                                <p style="color: #e2e8f0; margin-bottom: 20px; line-height: 1.5;">Use deterministic scoring rules without subjective interpretation for consistent organizational evaluations.</p>
+                                <button class="btn btn-secondary" onclick="window.open('evaluation_rules_matrix.md', '_blank')" style="width: 100%; background: rgba(99, 102, 241, 0.15); border-color: rgba(129, 140, 248, 0.3); color: #a5b4fc;">
+                                    <span>📋</span> View Matrix Rules
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Questionnaire System -->
+                        <div class="creation-method">
+                            <div style="background: rgba(244, 114, 182, 0.1); border: 2px solid rgba(249, 168, 212, 0.25); border-radius: 16px; padding: 28px; text-align: center; backdrop-filter: blur(20px);">
+                                <h3 style="color: #f9a8d4; margin-bottom: 15px; font-weight: 600;">❓ Questionnaire System</h3>
+                                <p style="color: #e2e8f0; margin-bottom: 20px; line-height: 1.5;">Use structured interview questions for systematic project evaluation with stakeholder input.</p>
+                                <button class="btn btn-secondary" onclick="window.open('evaluation_questionnaire.md', '_blank')" style="width: 100%; background: rgba(244, 114, 182, 0.15); border-color: rgba(249, 168, 212, 0.3); color: #f9a8d4;">
+                                    <span>📝</span> View Questions
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 40px; padding: 24px; background: rgba(71, 85, 105, 0.15); border-radius: 16px; border-left: 4px solid #94a3b8; backdrop-filter: blur(20px);">
+                        <h4 style="color: #cbd5e1; margin-bottom: 12px; font-weight: 600;">💡 Recommendation</h4>
+                        <p style="color: #e2e8f0; line-height: 1.5;">
+                            <strong>New users:</strong> Start with the Interactive Builder for guided project creation.<br>
+                            <strong>Quick evaluation:</strong> Use the Quick Evaluation form for rapid assessment.<br>
+                            <strong>Enterprise users:</strong> Use Claude Code commands for AI-assisted creation.<br>
+                            <strong>Systematic evaluation:</strong> Use Python Calculator or Rule-Based Matrix for consistent scoring.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Portfolio Analytics Tab -->
+        <div class="tab-content" id="content-analytics">
+            <div class="analytics-container">
+                <div class="analytics-grid">
+                    <div class="analytics-sidebar">
+                        <div class="control-section">
+                            <h3>Portfolio Overview</h3>
+                            <div class="stat-card" style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; text-align: center; margin-bottom: 20px;">
+                                <div style="font-size: 2em; color: #cbd5e1; font-weight: 700;" id="total-projects">0</div>
+                                <div style="color: #94a3b8; font-weight: 500;">Total Projects</div>
+                            </div>
+                            
+                            <div style="margin-bottom: 20px; padding: 16px; background: rgba(148, 163, 184, 0.1); border: 1px solid rgba(148, 163, 184, 0.2); border-radius: 12px; font-size: 12px; color: #e2e8f0; backdrop-filter: blur(10px);">
+                                <strong style="color: #cbd5e1;">📚 Calibration Examples</strong><br>
+                                Projects marked "[Example]" are provided for scoring calibration across all priority levels.
+                            </div>
+                        </div>
+
+                        <div class="control-section">
+                            <h3>Filter by Priority</h3>
+                            <div class="filter-group">
+                                <div class="filter-checkbox">
+                                    <input type="checkbox" id="priority-1" checked>
+                                    <span>Priority 1 <span class="priority-badge priority-1">HIGH VALUE / LOW RISK</span></span>
+                                </div>
+                                <div class="filter-checkbox">
+                                    <input type="checkbox" id="priority-2" checked>
+                                    <span>Priority 2 <span class="priority-badge priority-2">HIGH VALUE / MED RISK</span></span>
+                                </div>
+                                <div class="filter-checkbox">
+                                    <input type="checkbox" id="priority-3" checked>
+                                    <span>Priority 3 <span class="priority-badge priority-3">MED VALUE / LOW RISK</span></span>
+                                </div>
+                                <div class="filter-checkbox">
+                                    <input type="checkbox" id="priority-4" checked>
+                                    <span>Priority 4 <span class="priority-badge priority-4">LOW VALUE / HIGH RISK</span></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="control-section">
+                            <h3>Filter by Strategy</h3>
+                            <div class="filter-group">
+                                <div class="filter-checkbox">
+                                    <input type="checkbox" id="strategy-1" checked>
+                                    <span>Direct Prompting</span>
+                                </div>
+                                <div class="filter-checkbox">
+                                    <input type="checkbox" id="strategy-2" checked>
+                                    <span>Formalized Assets</span>
+                                </div>
+                                <div class="filter-checkbox">
+                                    <input type="checkbox" id="strategy-3" checked>
+                                    <span>Live Production</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="control-section">
+                            <h3>Filter by Category</h3>
+                            <div class="filter-group">
+                                <div class="filter-checkbox">
+                                    <input type="checkbox" id="cat-content" checked>
+                                    <span>Content Generation</span>
+                                </div>
+                                <div class="filter-checkbox">
+                                    <input type="checkbox" id="cat-classification" checked>
+                                    <span>Classification</span>
+                                </div>
+                                <div class="filter-checkbox">
+                                    <input type="checkbox" id="cat-search" checked>
+                                    <span>Search & Retrieval</span>
+                                </div>
+                                <div class="filter-checkbox">
+                                    <input type="checkbox" id="cat-extraction" checked>
+                                    <span>Data Extraction</span>
+                                </div>
+                                <div class="filter-checkbox">
+                                    <input type="checkbox" id="cat-conversational" checked>
+                                    <span>Conversational</span>
+                                </div>
+                                <div class="filter-checkbox">
+                                    <input type="checkbox" id="cat-code" checked>
+                                    <span>Code & Technical</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button class="btn btn-primary" onclick="refreshPortfolio()" style="width: 100%; margin-top: 15px;">
+                            <span>🔄</span> Refresh Data
+                        </button>
+                    </div>
+                    
+                    <div class="analytics-main">
+                        <!-- Risk/Value Matrix -->
+                        <div class="tab-workspace">
+                            <h2 style="color: #cbd5e1; margin-bottom: 18px; font-weight: 600;">Risk/Value Portfolio Matrix</h2>
+                            <p style="color: #94a3b8; margin-bottom: 24px;">Projects positioned by risk score (x-axis) and value score (y-axis)</p>
+                            
+                            <div class="risk-value-matrix" id="risk-value-matrix">
+                                <!-- Content populated by JavaScript -->
+                            </div>
+                        </div>
+
+                        <!-- Project Portfolio List -->
+                        <div class="portfolio-project-list">
+                            <div class="project-list-header">
+                                <h3 style="color: #f8fafc; font-weight: 600;">Project Portfolio</h3>
+                                <div class="sort-controls">
+                                    <label for="sort-by" style="color: #94a3b8; font-weight: 500;">Sort by:</label>
+                                    <select id="sort-by">
+                                        <option value="score">Final Score</option>
+                                        <option value="priority">Priority Level</option>
+                                        <option value="value">Value Score</option>
+                                        <option value="risk">Risk Score</option>
+                                        <option value="name">Project Name</option>
+                                        <option value="date">Date Created</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div id="portfolio-project-list">
+                                <div class="loading">Loading portfolio projects...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tooltip -->
+    <div class="tooltip" id="tooltip">
+        <h4 id="tooltip-title"></h4>
+        <div id="tooltip-content"></div>
+    </div>
+
+    <!-- Project Details Modal -->
+    <div class="project-modal" id="project-modal">
+        <div class="modal-content">
+            <button class="modal-close" id="modal-close">&times;</button>
+            <div class="modal-header">
+                <h2 class="modal-title" id="modal-title"></h2>
+                <div class="modal-meta" id="modal-meta"></div>
+            </div>
+            <div class="modal-body" id="modal-body"></div>
+        </div>
+    </div>
+
+    <script>
+        // Global state
+        let currentProjectId = null;
+        let projects = {};
+        let allPortfolioProjects = [];
+        let filteredPortfolioProjects = [];
+        
+        // Tab switching
+        function switchMainTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+            
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.getElementById(`content-${tabName}`).classList.add('active');
+            
+            // Initialize tab-specific content
+            if (tabName === 'builder') {
+                loadProjects();
+            } else if (tabName === 'analytics') {
+                initializeAnalytics();
+            }
+        }
+        
+        // Project Builder Functions
+        async function loadProjects() {
+            const projectsList = document.getElementById('projectsList');
+            projectsList.innerHTML = '<div class="loading">Loading projects...</div>';
+
+            try {
+                const response = await fetch('http://localhost:8100/api/projects');
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success && data.projects) {
+                        const serverProjects = data.projects.map(serverProject => ({
+                            id: serverProject.id,
+                            name: serverProject.name,
+                            description: serverProject.description,
+                            submitter: serverProject.submitter,
+                            department: serverProject.department,
+                            date: serverProject.date,
+                            priority: serverProject.priority,
+                            finalScore: serverProject.finalScore,
+                            riskScore: serverProject.riskScore,
+                            valueScore: serverProject.valueScore,
+                            category: serverProject.category,
+                            strategy: serverProject.strategy,
+                            status: 'server',
+                            source: 'portfolio'
+                        }));
+
+                        const allProjects = [...Object.values(projects), ...serverProjects];
+                        
+                        projectsList.innerHTML = '';
+                        
+                        if (allProjects.length === 0) {
+                            projectsList.innerHTML = `
+                                <div style="text-align: center; color: #aaa; padding: 20px;">
+                                    <p>No projects found</p>
+                                    <button class="btn btn-primary" onclick="createNewProject()" style="margin-top: 10px;">
+                                        Create Your First Project
+                                    </button>
+                                </div>
+                            `;
+                            return;
+                        }
+
+                        // Store for filtering and sorting
+                        window.builderProjects = allProjects;
+                        applyBuilderFilters();
+                        
+                        // Setup event listeners
+                        setupBuilderEventListeners();
+                    }
+                }
+            } catch (error) {
+                console.warn('Could not load projects from server:', error.message);
+                
+                // Clear loading state
+                projectsList.innerHTML = '';
+                
+                // Show local projects if any exist
+                const localProjects = Object.values(projects);
+                if (localProjects.length === 0) {
+                    projectsList.innerHTML = `
+                        <div style="text-align: center; color: #aaa; padding: 20px;">
+                            <p>No projects found</p>
+                            <p style="font-size: 12px; margin-top: 8px; color: #ff6b6b;">Server offline - showing local projects only</p>
+                            <button class="btn btn-primary" onclick="createNewProject()" style="margin-top: 10px;">
+                                Create Your First Project
+                            </button>
+                        </div>
+                    `;
+                } else {
+                    // Store and display local projects
+                    window.builderProjects = localProjects;
+                    renderBuilderProjects(localProjects);
+                    
+                    // Add server offline notice
+                    const notice = document.createElement('div');
+                    notice.innerHTML = `
+                        <div style="padding: 10px; text-align: center; color: #ff6b6b; font-size: 12px; margin-top: 10px; border-top: 1px solid rgba(255, 107, 107, 0.3);">
+                            Portfolio server offline - showing ${localProjects.length} local projects only
+                        </div>
+                    `;
+                    projectsList.appendChild(notice);
+                }
+            }
+        }
+
+        function renderBuilderProjects(projects) {
+            const projectsList = document.getElementById('projectsList');
+            
+            // Clear existing content (but not loading state)
+            const existingProjects = projectsList.querySelectorAll('.portfolio-project-item');
+            existingProjects.forEach(item => item.remove());
+            
+            // Add projects
+            projects.forEach(project => {
+                const projectElement = createProjectElement(project);
+                projectsList.appendChild(projectElement);
+            });
+        }
+
+        function applyBuilderFilters() {
+            if (!window.builderProjects) return;
+            
+            const hideExamples = document.getElementById('hide-examples')?.checked || false;
+            
+            let filteredProjects = window.builderProjects.filter(project => {
+                if (hideExamples && project.name.startsWith('[Example]')) {
+                    return false;
+                }
+                return true;
+            });
+            
+            // Apply current sorting
+            const sortBy = document.getElementById('builder-sort-by')?.value || 'date';
+            filteredProjects.sort((a, b) => {
+                switch (sortBy) {
+                    case 'score':
+                        return (b.finalScore || 0) - (a.finalScore || 0);
+                    case 'priority':
+                        return (a.priority || 3) - (b.priority || 3);
+                    case 'name':
+                        return (a.name || '').localeCompare(b.name || '');
+                    case 'date':
+                        return new Date(b.date || 0) - new Date(a.date || 0);
+                    case 'source':
+                        return (a.source || 'local').localeCompare(b.source || 'local');
+                    default:
+                        return new Date(b.date || 0) - new Date(a.date || 0);
+                }
+            });
+            
+            renderBuilderProjects(filteredProjects);
+        }
+
+        function sortBuilderProjects() {
+            applyBuilderFilters(); // Re-apply filters and sorting
+        }
+
+        function setupBuilderEventListeners() {
+            // Sort dropdown
+            const sortSelect = document.getElementById('builder-sort-by');
+            if (sortSelect) {
+                sortSelect.removeEventListener('change', sortBuilderProjects);
+                sortSelect.addEventListener('change', sortBuilderProjects);
+            }
+            
+            // Hide examples checkbox
+            const hideExamplesCheckbox = document.getElementById('hide-examples');
+            if (hideExamplesCheckbox) {
+                hideExamplesCheckbox.removeEventListener('change', applyBuilderFilters);
+                hideExamplesCheckbox.addEventListener('change', applyBuilderFilters);
+            }
+        }
+        
+        function createProjectElement(project) {
+            const div = document.createElement('div');
+            div.className = 'portfolio-project-item';
+            div.style.cursor = 'pointer';
+            div.style.width = '100%';
+            div.style.marginBottom = '12px';
+            
+            let statusClass, statusText, sourceIcon;
+            if (project.source === 'portfolio') {
+                statusClass = 'status-portfolio';
+                statusText = project.name.startsWith('[Example]') ? 'Example' : 'Portfolio';
+                sourceIcon = project.name.startsWith('[Example]') ? '📚' : '📊';
+            } else {
+                statusClass = 'status-draft';
+                statusText = 'Draft';
+                sourceIcon = '📝';
+            }
+
+            // Use same design as portfolio analytics, optimized for sidebar width
+            div.innerHTML = `
+                <div class="portfolio-project-header" onclick="selectProject('${project.id}')">
+                    <div style="flex: 1;">
+                        <div class="portfolio-project-title" style="font-size: 14px;">
+                            <span class="project-icon">${sourceIcon}</span>
+                            ${project.name || 'Untitled Project'}
+                        </div>
+                        <div class="portfolio-project-meta" style="font-size: 11px;">${project.submitter || 'Unknown'} • ${project.department || 'Unknown'} • ${project.date || 'No date'}</div>
+                    </div>
+                    <span class="priority-badge priority-${project.priority || 3}" style="font-size: 10px; padding: 3px 6px;">${project.priority || 3}</span>
+                </div>
+                <div class="portfolio-project-scores" style="gap: 10px;">
+                    <div class="portfolio-score-item">
+                        <div class="portfolio-score-value" style="font-size: 16px;">${(project.finalScore || 0).toFixed(2)}</div>
+                        <div class="portfolio-score-label" style="font-size: 10px;">Final Score</div>
+                    </div>
+                    <div class="portfolio-score-item">
+                        <div class="portfolio-score-value" style="font-size: 16px;">${(project.valueScore || 0).toFixed(1)}</div>
+                        <div class="portfolio-score-label" style="font-size: 10px;">Value</div>
+                    </div>
+                    <div class="portfolio-score-item">
+                        <div class="portfolio-score-value" style="font-size: 16px;">${(project.riskScore || 0).toFixed(1)}</div>
+                        <div class="portfolio-score-label" style="font-size: 10px;">Risk</div>
+                    </div>
+                </div>
+                <div class="portfolio-project-description" style="font-size: 12px; line-height: 1.3;">
+                    ${project.description ? (project.description.length > 140 ? project.description.substring(0, 140) + '...' : project.description) : (project.source === 'portfolio' ? 'No description available' : 'Click to edit this project')}
+                </div>
+                <div class="portfolio-project-tags" style="gap: 4px;">
+                    <span class="portfolio-tag strategy" style="font-size: 9px; padding: 2px 5px;">${project.strategy || 'Unknown'}</span>
+                    <span class="portfolio-tag category" style="font-size: 9px; padding: 2px 5px;">${project.category || 'Unknown'}</span>
+                    <span class="portfolio-tag" style="background: ${statusClass === 'status-draft' ? '#6c757d' : 'rgba(0, 255, 136, 0.8)'}; color: white; font-size: 9px; padding: 2px 5px;">${statusText}</span>
+                </div>
+            `;
+
+            return div;
+        }
+        
+        function createNewProject() {
+            const newId = Date.now().toString();
+            const newProject = {
+                id: newId,
+                name: 'New Project',
+                date: new Date().toISOString().split('T')[0],
+                status: 'draft'
+            };
+            
+            projects[newId] = newProject;
+            currentProjectId = newId;
+            loadProjects();
+            clearForm();
+        }
+        
+        function selectProject(projectId) {
+            // Find project from either local or portfolio projects
+            let project = projects[projectId];
+            
+            if (!project && window.builderProjects) {
+                project = window.builderProjects.find(p => p.id === projectId);
+            }
+            
+            if (!project) {
+                showStatusMessage('Project not found', 'error');
+                return;
+            }
+            
+            // Update UI to show selected project
+            currentProjectId = projectId;
+            updateProjectSelection();
+            
+            // Load project data into form
+            loadProjectData(project);
+            
+            // Update save button based on project type
+            updateSaveButtonState(project);
+        }
+
+        function updateProjectSelection() {
+            // Update visual selection in project list
+            document.querySelectorAll('.portfolio-project-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Find and highlight selected project
+            const selectedProject = document.querySelector(`[onclick="selectProject('${currentProjectId}')"]`)?.closest('.portfolio-project-item');
+            if (selectedProject) {
+                selectedProject.classList.add('active');
+            }
+        }
+
+        function updateSaveButtonState(project) {
+            const saveButton = document.querySelector('button[onclick="saveProject()"]');
+            const saveToPortfolioButton = document.querySelector('button[onclick="saveToPortfolio()"]');
+            
+            if (project.name && project.name.startsWith('[Example]')) {
+                // This is an example - disable overwriting, enable "Save as New"
+                if (saveButton) {
+                    saveButton.innerHTML = '<span>📋</span> Save as New Project';
+                    saveButton.onclick = () => saveAsNewProject();
+                }
+                
+                // Show notice about examples
+                showExampleNotice();
+            } else {
+                // Regular project - enable normal saving
+                if (saveButton) {
+                    saveButton.innerHTML = '<span>💾</span> Save Project';
+                    saveButton.onclick = () => saveProject();
+                }
+                hideExampleNotice();
+            }
+        }
+
+        function showExampleNotice() {
+            let notice = document.getElementById('example-notice');
+            if (!notice) {
+                notice = document.createElement('div');
+                notice.id = 'example-notice';
+                notice.innerHTML = `
+                    <div style="background: rgba(251, 191, 36, 0.15); border: 1px solid rgba(251, 191, 36, 0.4); border-radius: 8px; padding: 12px; margin: 15px 0; font-size: 12px; color: #fbbf24;">
+                        <strong>📚 Example Project</strong><br>
+                        You're viewing a calibration example. Customize it and use "Save as New Project" to create your own version.
+                    </div>
+                `;
+                const workspace = document.querySelector('.builder-main .tab-workspace');
+                workspace.insertBefore(notice, workspace.firstChild.nextSibling);
+            }
+        }
+
+        function hideExampleNotice() {
+            const notice = document.getElementById('example-notice');
+            if (notice) {
+                notice.remove();
+            }
+        }
+
+        function saveAsNewProject() {
+            // Create a new project ID
+            const newId = Date.now().toString();
+            
+            // Get current form data
+            const newProject = {
+                id: newId,
+                name: document.getElementById('projectName').value || 'Untitled Project',
+                submitter: document.getElementById('submitter').value || 'Unknown',
+                department: document.getElementById('department').value || 'Unknown',
+                description: document.getElementById('description').value || '',
+                category: document.getElementById('category').value || 'Unknown',
+                strategy: document.getElementById('strategy').value || 'To be determined',
+                date: new Date().toISOString().split('T')[0],
+                status: 'draft',
+                lastModified: new Date().toISOString()
+            };
+            
+            // Add to local projects
+            projects[newId] = newProject;
+            currentProjectId = newId;
+            
+            // Refresh the project list and update selection
+            loadProjects();
+            
+            // Show success message
+            showStatusMessage('New project created from example template! You can now edit and save this project.', 'success');
+        }
+        
+        function loadProjectData(project) {
+            document.getElementById('projectName').value = project.name || '';
+            document.getElementById('submitter').value = project.submitter || '';
+            document.getElementById('department').value = project.department || '';
+            document.getElementById('description').value = project.description || '';
+            document.getElementById('category').value = project.category || '';
+            document.getElementById('strategy').value = project.strategy || '';
+            
+            // Load evaluation data if it exists
+            if (project.evaluationCriteria) {
+                document.getElementById('revenueImpact').value = project.evaluationCriteria.revenueImpact || '';
+                document.getElementById('timeToValue').value = project.evaluationCriteria.timeToValue || '';
+                document.getElementById('strategicAlignment').value = project.evaluationCriteria.strategicAlignment || '';
+                document.getElementById('technicalComplexity').value = project.evaluationCriteria.technicalComplexity || '';
+                document.getElementById('dataAvailability').value = project.evaluationCriteria.dataAvailability || '';
+                document.getElementById('resourceRequirements').value = project.evaluationCriteria.resourceRequirements || '';
+                
+                // Show evaluation results if scores exist
+                if (project.valueScore !== undefined && project.riskScore !== undefined) {
+                    document.getElementById('valueScore').textContent = project.valueScore.toFixed(2);
+                    document.getElementById('riskScore').textContent = project.riskScore.toFixed(2);
+                    document.getElementById('finalScore').textContent = project.finalScore.toFixed(2);
+                    document.getElementById('priorityLevel').textContent = project.priority;
+                    
+                    // Set priority color
+                    const priorityColors = {
+                        1: '#4ade80',
+                        2: '#fbbf24', 
+                        3: '#60a5fa',
+                        4: '#f87171'
+                    };
+                    document.getElementById('priorityLevel').style.color = priorityColors[project.priority] || '#94a3b8';
+                    
+                    document.getElementById('recommendation').textContent = project.recommendation || 'No recommendation available';
+                    document.getElementById('evaluationResults').style.display = 'block';
+                    document.getElementById('applyEvalBtn').style.display = 'inline-flex';
+                    
+                    // Store current evaluation
+                    window.currentEvaluation = {
+                        valueScore: project.valueScore,
+                        riskScore: project.riskScore,
+                        finalScore: project.finalScore,
+                        priority: project.priority,
+                        recommendation: project.recommendation,
+                        criteria: project.evaluationCriteria
+                    };
+                }
+            } else {
+                // Clear evaluation form if no evaluation data
+                clearEvaluation();
+            }
+        }
+        
+        function clearForm() {
+            document.getElementById('projectName').value = '';
+            document.getElementById('submitter').value = '';
+            document.getElementById('department').value = '';
+            document.getElementById('description').value = '';
+            document.getElementById('category').value = '';
+            document.getElementById('strategy').value = '';
+            
+            // Also clear evaluation form
+            clearEvaluation();
+        }
+        
+        function saveProject() {
+            if (!currentProjectId) {
+                alert('Please create or select a project first');
+                return;
+            }
+            
+            const project = projects[currentProjectId] || {};
+            project.name = document.getElementById('projectName').value || 'Untitled Project';
+            project.submitter = document.getElementById('submitter').value;
+            project.department = document.getElementById('department').value;
+            project.description = document.getElementById('description').value;
+            project.category = document.getElementById('category').value;
+            project.strategy = document.getElementById('strategy').value;
+            project.lastModified = new Date().toISOString();
+            
+            projects[currentProjectId] = project;
+            loadProjects();
+            
+            // Show success feedback
+            const saveButton = event.target;
+            const originalText = saveButton.innerHTML;
+            saveButton.innerHTML = '<span>✅</span> Saved!';
+            setTimeout(() => {
+                saveButton.innerHTML = originalText;
+            }, 2000);
+        }
+        
+        async function saveToPortfolio() {
+            if (!currentProjectId) {
+                showStatusMessage('Please create or select a project first', 'warning');
+                return;
+            }
+
+            const project = projects[currentProjectId];
+            if (!project) {
+                showStatusMessage('Project data not found', 'error');
+                return;
+            }
+
+            // Save current form data first
+            saveProject();
+
+            const saveButton = event.target;
+            const originalText = saveButton.innerHTML;
+            saveButton.innerHTML = '<span>⏳</span> Saving...';
+            saveButton.disabled = true;
+
+            try {
+                const projectData = {
+                    name: project.name || 'Untitled Project',
+                    submitter: project.submitter || 'Project Builder User',
+                    department: project.department || 'Unknown',
+                    description: project.description || 'No description provided',
+                    category: project.category || 'Unknown',
+                    strategy: project.strategy || 'To be determined',
+                    riskScore: 2.5,
+                    valueScore: 2.5,
+                    finalScore: 0,
+                    priority: 3,
+                    recommendation: 'Pending detailed evaluation'
+                };
+
+                const response = await fetch('http://localhost:8100/api/projects', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(projectData)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showStatusMessage(`Project saved to portfolio successfully! Project ID: ${result.projectId}`, 'success');
+                    
+                    // Auto-switch to analytics after a brief delay
+                    setTimeout(() => {
+                        switchMainTab('analytics');
+                    }, 2000);
+                } else {
+                    throw new Error(result.error || 'Failed to save project');
+                }
+            } catch (error) {
+                showStatusMessage(`Failed to save project to portfolio: ${error.message}`, 'error');
+            } finally {
+                saveButton.innerHTML = originalText;
+                saveButton.disabled = false;
+            }
+        }
+        
+        function exportProject() {
+            if (!currentProjectId) {
+                alert('Please create or select a project first');
+                return;
+            }
+            
+            const project = projects[currentProjectId];
+            if (!project) {
+                alert('Project data not found');
+                return;
+            }
+            
+            const blob = new Blob([JSON.stringify(project, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${project.name.replace(/\s+/g, '_')}_project.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+        
+        // Portfolio Analytics Functions
+        async function initializeAnalytics() {
+            try {
+                const response = await fetch('http://localhost:8100/api/projects');
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success) {
+                        allPortfolioProjects = data.projects;
+                        filteredPortfolioProjects = [...allPortfolioProjects];
+                        updatePortfolioStats();
+                        renderPortfolioMatrix();
+                        renderPortfolioProjectList();
+                        setupAnalyticsEventListeners();
+                    }
+                }
+            } catch (error) {
+                console.warn('Could not load portfolio data:', error);
+            }
+        }
+        
+        function updatePortfolioStats() {
+            document.getElementById('total-projects').textContent = filteredPortfolioProjects.length;
+        }
+        
+        function renderPortfolioMatrix() {
+            const matrix = document.getElementById('risk-value-matrix');
+            matrix.innerHTML = `
+                <!-- Quadrant Labels -->
+                <div style="position: absolute; top: 15px; left: 15px; background: rgba(34, 197, 94, 0.2); color: #4ade80; padding: 12px 16px; border-radius: 12px; font-size: 12px; font-weight: 600; backdrop-filter: blur(10px); border: 1px solid rgba(34, 197, 94, 0.3);">
+                    High Value / Low Risk<br><strong>Priority 1</strong>
+                </div>
+                <div style="position: absolute; top: 15px; right: 15px; background: rgba(217, 119, 6, 0.2); color: #fbbf24; padding: 12px 16px; border-radius: 12px; font-size: 12px; font-weight: 600; backdrop-filter: blur(10px); border: 1px solid rgba(217, 119, 6, 0.3);">
+                    High Value / High Risk<br><strong>Priority 2</strong>
+                </div>
+                <div style="position: absolute; bottom: 15px; left: 15px; background: rgba(37, 99, 235, 0.2); color: #60a5fa; padding: 12px 16px; border-radius: 12px; font-size: 12px; font-weight: 600; backdrop-filter: blur(10px); border: 1px solid rgba(37, 99, 235, 0.3);">
+                    Low Value / Low Risk<br><strong>Priority 3</strong>
+                </div>
+                <div style="position: absolute; bottom: 15px; right: 15px; background: rgba(220, 38, 38, 0.2); color: #f87171; padding: 12px 16px; border-radius: 12px; font-size: 12px; font-weight: 600; backdrop-filter: blur(10px); border: 1px solid rgba(220, 38, 38, 0.3);">
+                    Low Value / High Risk<br><strong>Priority 4</strong>
+                </div>
+                
+                <!-- Axis Lines -->
+                <div style="position: absolute; left: 50%; top: 0; width: 1px; height: 100%; background: rgba(148, 163, 184, 0.4); transform: translateX(-50%);"></div>
+                <div style="position: absolute; top: 50%; left: 0; width: 100%; height: 1px; background: rgba(148, 163, 184, 0.4); transform: translateY(-50%);"></div>
+                
+                <!-- Axis Labels -->
+                <div style="position: absolute; bottom: -35px; left: 50%; transform: translateX(-50%); font-size: 12px; color: #94a3b8; font-weight: 500;">Risk Score</div>
+                <div style="position: absolute; left: -85px; top: 50%; transform: translateY(-50%) rotate(-90deg); font-size: 12px; color: #94a3b8; font-weight: 500;">Value Score</div>
+            `;
+            
+            // Clear existing dots and add filtered project dots
+            const existingDots = matrix.querySelectorAll('.project-dot');
+            existingDots.forEach(dot => dot.remove());
+            
+            filteredPortfolioProjects.forEach(project => {
+                const dot = document.createElement('div');
+                dot.className = `project-dot priority-${project.priority}`;
+                dot.dataset.projectId = project.id;
+                
+                // Position calculation (using actual data ranges)
+                const riskMin = 0.8, riskMax = 2.5;
+                const valueMin = 1.5, valueMax = 3.0;
+                const xPercent = ((project.riskScore - riskMin) / (riskMax - riskMin)) * 90 + 5;
+                const yPercent = 95 - ((project.valueScore - valueMin) / (valueMax - valueMin)) * 90;
+                
+                dot.style.left = `${xPercent}%`;
+                dot.style.top = `${yPercent}%`;
+                
+                matrix.appendChild(dot);
+            });
+        }
+        
+        function renderPortfolioProjectList() {
+            const listContainer = document.getElementById('portfolio-project-list');
+            listContainer.innerHTML = '';
+
+            filteredPortfolioProjects.forEach(project => {
+                const projectItem = document.createElement('div');
+                projectItem.className = 'portfolio-project-item';
+                projectItem.innerHTML = `
+                    <div class="portfolio-project-header">
+                        <div>
+                            <div class="portfolio-project-title">${project.name}</div>
+                            <div class="portfolio-project-meta">${project.submitter} • ${project.department} • ${project.date}</div>
+                        </div>
+                        <span class="priority-badge priority-${project.priority}">Priority ${project.priority}</span>
+                    </div>
+                    <div class="portfolio-project-scores">
+                        <div class="portfolio-score-item">
+                            <div class="portfolio-score-value">${project.finalScore.toFixed(2)}</div>
+                            <div class="portfolio-score-label">Final Score</div>
+                        </div>
+                        <div class="portfolio-score-item">
+                            <div class="portfolio-score-value">${project.valueScore.toFixed(1)}</div>
+                            <div class="portfolio-score-label">Value</div>
+                        </div>
+                        <div class="portfolio-score-item">
+                            <div class="portfolio-score-value">${project.riskScore.toFixed(1)}</div>
+                            <div class="portfolio-score-label">Risk</div>
+                        </div>
+                    </div>
+                    <div class="portfolio-project-description">${project.description}</div>
+                    <div class="portfolio-project-tags">
+                        <span class="portfolio-tag strategy">${project.strategy}</span>
+                        <span class="portfolio-tag category">${project.category}</span>
+                    </div>
+                `;
+                listContainer.appendChild(projectItem);
+            });
+        }
+        
+        // Apply filters based on selected checkboxes
+        function applyPortfolioFilters() {
+            filteredPortfolioProjects = allPortfolioProjects.filter(project => {
+                // Priority filters
+                const priorityChecked = document.getElementById(`priority-${project.priority}`).checked;
+                if (!priorityChecked) return false;
+
+                // Strategy filters
+                const strategyMap = {
+                    'Strategy 1: Direct Prompting': 'strategy-1',
+                    'Strategy 2: Formalized Assets': 'strategy-2',
+                    'Strategy 3: Live Production': 'strategy-3'
+                };
+                const strategyChecked = document.getElementById(strategyMap[project.strategy]).checked;
+                if (!strategyChecked) return false;
+
+                // Category filters
+                const categoryMap = {
+                    'Content Generation': 'cat-content',
+                    'Classification': 'cat-classification',
+                    'Search & Retrieval': 'cat-search',
+                    'Data Extraction': 'cat-extraction',
+                    'Conversational': 'cat-conversational',
+                    'Code & Technical': 'cat-code'
+                };
+                const categoryChecked = document.getElementById(categoryMap[project.category]).checked;
+                if (!categoryChecked) return false;
+
+                return true;
+            });
+
+            updatePortfolioStats();
+            renderPortfolioMatrix();
+            renderPortfolioProjectList();
+        }
+
+        // Sort projects based on selected option
+        function sortPortfolioProjects() {
+            const sortBy = document.getElementById('sort-by').value;
+            
+            filteredPortfolioProjects.sort((a, b) => {
+                switch (sortBy) {
+                    case 'score':
+                        return b.finalScore - a.finalScore;
+                    case 'priority':
+                        return a.priority - b.priority;
+                    case 'value':
+                        return b.valueScore - a.valueScore;
+                    case 'risk':
+                        return a.riskScore - b.riskScore;
+                    case 'name':
+                        return a.name.localeCompare(b.name);
+                    case 'date':
+                        return new Date(b.date) - new Date(a.date);
+                    default:
+                        return 0;
+                }
+            });
+
+            renderPortfolioProjectList();
+        }
+
+        // Setup event listeners for analytics
+        function setupAnalyticsEventListeners() {
+            // Filter checkboxes
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', applyPortfolioFilters);
+            });
+
+            // Sort dropdown
+            document.getElementById('sort-by').addEventListener('change', sortPortfolioProjects);
+
+            // Tooltip for matrix dots
+            const matrix = document.getElementById('risk-value-matrix');
+            const tooltip = document.getElementById('tooltip');
+
+            matrix.addEventListener('mouseover', (e) => {
+                if (e.target.classList.contains('project-dot')) {
+                    const projectId = e.target.dataset.projectId;
+                    const project = allPortfolioProjects.find(p => p.id === projectId);
+                    
+                    document.getElementById('tooltip-title').textContent = project.name;
+                    document.getElementById('tooltip-content').innerHTML = `
+                        <div><strong>Final Score:</strong> ${project.finalScore.toFixed(2)}</div>
+                        <div><strong>Value Score:</strong> ${project.valueScore.toFixed(1)}</div>
+                        <div><strong>Risk Score:</strong> ${project.riskScore.toFixed(1)}</div>
+                        <div><strong>Priority:</strong> ${project.priority}</div>
+                        <div><strong>Category:</strong> ${project.category}</div>
+                        <div><strong>Strategy:</strong> ${project.strategy}</div>
+                    `;
+                    
+                    tooltip.style.display = 'block';
+                }
+            });
+
+            matrix.addEventListener('mousemove', (e) => {
+                if (e.target.classList.contains('project-dot')) {
+                    tooltip.style.left = e.pageX + 10 + 'px';
+                    tooltip.style.top = e.pageY - 50 + 'px';
+                }
+            });
+
+            matrix.addEventListener('mouseout', (e) => {
+                if (e.target.classList.contains('project-dot')) {
+                    tooltip.style.display = 'none';
+                }
+            });
+
+            // Double-click to show project details
+            matrix.addEventListener('dblclick', (e) => {
+                if (e.target.classList.contains('project-dot')) {
+                    const projectId = e.target.dataset.projectId;
+                    showProjectModal(projectId);
+                }
+            });
+
+            // Modal close event listeners
+            const modal = document.getElementById('project-modal');
+            const modalClose = document.getElementById('modal-close');
+            
+            modalClose.addEventListener('click', hideProjectModal);
+            
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    hideProjectModal();
+                }
+            });
+            
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && modal.classList.contains('show')) {
+                    hideProjectModal();
+                }
+            });
+        }
+
+        // Show project details modal
+        async function showProjectModal(projectId) {
+            const modal = document.getElementById('project-modal');
+            const modalTitle = document.getElementById('modal-title');
+            const modalMeta = document.getElementById('modal-meta');
+            const modalBody = document.getElementById('modal-body');
+            
+            const project = allPortfolioProjects.find(p => p.id === projectId);
+            if (!project) {
+                console.error('Project not found:', projectId);
+                return;
+            }
+            
+            modalTitle.textContent = project.name;
+            modalMeta.innerHTML = `
+                <span><strong>Priority:</strong> ${project.priority}</span>
+                <span><strong>Score:</strong> ${project.finalScore.toFixed(2)}</span>
+                <span><strong>Department:</strong> ${project.department}</span>
+                <span><strong>Date:</strong> ${project.date}</span>
+            `;
+            modalBody.innerHTML = '<div style="text-align: center; color: #aaa; padding: 40px;">Loading project details...</div>';
+            
+            modal.classList.add('show');
+            
+            try {
+                const response = await fetch(`http://localhost:8100/api/projects/${projectId}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                
+                if (data.success && data.project.fullContent) {
+                    const htmlContent = convertMarkdownToHtml(data.project.fullContent);
+                    modalBody.innerHTML = htmlContent;
+                } else {
+                    throw new Error('Full content not available');
+                }
+            } catch (error) {
+                modalBody.innerHTML = `
+                    <div style="color: #ff6b6b; text-align: center; padding: 20px;">
+                        <h3>Unable to load full project details</h3>
+                        <p>Error: ${error.message}</p>
+                    </div>
+                    <div style="margin-top: 20px;">
+                        <h3>Project Summary</h3>
+                        <p><strong>Description:</strong> ${project.description}</p>
+                        <p><strong>Strategy:</strong> ${project.strategy}</p>
+                        <p><strong>Category:</strong> ${project.category}</p>
+                        <p><strong>Risk Score:</strong> ${project.riskScore}</p>
+                        <p><strong>Value Score:</strong> ${project.valueScore}</p>
+                        <p><strong>Final Score:</strong> ${project.finalScore}</p>
+                        <p><strong>Submitter:</strong> ${project.submitter}</p>
+                    </div>
+                `;
+            }
+        }
+
+        function hideProjectModal() {
+            const modal = document.getElementById('project-modal');
+            modal.classList.remove('show');
+        }
+
+        function convertMarkdownToHtml(markdown) {
+            let html = markdown
+                .replace(/^### (.*$)/gm, '<h3>$1</h3>')
+                .replace(/^## (.*$)/gm, '<h2>$1</h2>')
+                .replace(/^# (.*$)/gm, '<h1>$1</h1>')
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/^\- (.*$)/gm, '<li>$1</li>')
+                .replace(/^(\d+)\. (.*$)/gm, '<li>$2</li>')
+                .replace(/\n\n/g, '</p><p>')
+                .replace(/^(?!<[h1-6]|<ul|<ol|<li|<table|<div)/gm, '<p>')
+                .replace(/(?<!>)$/gm, '</p>')
+                .replace(/<p><\/p>/g, '')
+                .replace(/<p>(<[h1-6])/g, '$1')
+                .replace(/(<\/[h1-6]>)<\/p>/g, '$1');
+            
+            return html;
+        }
+        
+        function refreshPortfolio() {
+            initializeAnalytics();
+        }
+
+        // Project Creation Hub Functions
+        function copyCommands() {
+            const commands = '/prepare\n/eval project.md';
+            navigator.clipboard.writeText(commands).then(() => {
+                const button = event.target;
+                const originalText = button.innerHTML;
+                button.innerHTML = '<span>✅</span> Copied!';
+                setTimeout(() => {
+                    button.innerHTML = originalText;
+                }, 2000);
+            }).catch(() => {
+                showStatusMessage('Commands copied to clipboard: /prepare and /eval project.md', 'success');
+            });
+        }
+
+        // Non-intrusive status message system
+        function showStatusMessage(message, type = 'info') {
+            // Remove existing status message
+            const existingMessage = document.getElementById('status-message');
+            if (existingMessage) {
+                existingMessage.remove();
+            }
+            
+            // Create new status message
+            const statusDiv = document.createElement('div');
+            statusDiv.id = 'status-message';
+            
+            const colors = {
+                success: { bg: 'rgba(34, 197, 94, 0.15)', border: 'rgba(34, 197, 94, 0.4)', text: '#22c55e' },
+                error: { bg: 'rgba(239, 68, 68, 0.15)', border: 'rgba(239, 68, 68, 0.4)', text: '#ef4444' },
+                warning: { bg: 'rgba(251, 191, 36, 0.15)', border: 'rgba(251, 191, 36, 0.4)', text: '#fbbf24' },
+                info: { bg: 'rgba(59, 130, 246, 0.15)', border: 'rgba(59, 130, 246, 0.4)', text: '#3b82f6' }
+            };
+            
+            const color = colors[type] || colors.info;
+            
+            statusDiv.innerHTML = `
+                <div style="
+                    position: fixed; 
+                    top: 20px; 
+                    right: 20px; 
+                    background: ${color.bg}; 
+                    border: 1px solid ${color.border}; 
+                    color: ${color.text}; 
+                    padding: 15px 20px; 
+                    border-radius: 8px; 
+                    font-size: 14px; 
+                    font-weight: 500;
+                    max-width: 400px;
+                    z-index: 10000;
+                    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+                    backdrop-filter: blur(10px);
+                    animation: slideInRight 0.3s ease-out;
+                ">
+                    ${message}
+                    <button onclick="this.parentElement.parentElement.remove()" style="
+                        background: none; 
+                        border: none; 
+                        color: ${color.text}; 
+                        float: right; 
+                        margin-left: 15px; 
+                        cursor: pointer; 
+                        font-size: 16px;
+                        opacity: 0.7;
+                    ">&times;</button>
+                </div>
+            `;
+            
+            document.body.appendChild(statusDiv);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (statusDiv.parentElement) {
+                    statusDiv.remove();
+                }
+            }, 5000);
+        }
+
+        function showPythonInstructions() {
+            showStatusMessage(`Python Calculator Instructions: 1) Open terminal in project directory 2) Run: python scoring_calculator.py 3) Follow interactive prompts 4) Get deterministic scoring results`, 'info');
+        }
+
+        // Quick Evaluation Functions
+        function calculateEvaluation() {
+            // Get all evaluation criteria values
+            const revenueImpact = parseFloat(document.getElementById('revenueImpact').value) || 0;
+            const timeToValue = parseFloat(document.getElementById('timeToValue').value) || 0;
+            const strategicAlignment = parseFloat(document.getElementById('strategicAlignment').value) || 0;
+            const technicalComplexity = parseFloat(document.getElementById('technicalComplexity').value) || 0;
+            const dataAvailability = parseFloat(document.getElementById('dataAvailability').value) || 0;
+            const resourceRequirements = parseFloat(document.getElementById('resourceRequirements').value) || 0;
+
+            // Check if all fields are filled
+            if (!revenueImpact || !timeToValue || !strategicAlignment || !technicalComplexity || !dataAvailability || !resourceRequirements) {
+                showStatusMessage('Please complete all evaluation criteria before calculating', 'warning');
+                return;
+            }
+
+            // Calculate Value Score (average of business value factors)
+            const valueScore = ((revenueImpact + timeToValue + strategicAlignment) / 3).toFixed(2);
+
+            // Calculate Risk Score (average of risk factors)
+            const riskScore = ((technicalComplexity + dataAvailability + resourceRequirements) / 3).toFixed(2);
+
+            // Calculate Final Score (Value - Risk, normalized)
+            const finalScore = (valueScore - riskScore).toFixed(2);
+
+            // Determine Priority Level based on value/risk quadrants
+            let priority, priorityColor, recommendation;
+            
+            if (valueScore >= 3.5 && riskScore <= 2.5) {
+                priority = 1;
+                priorityColor = '#4ade80';
+                recommendation = 'HIGH PRIORITY: Proceed immediately. High value, low risk project with excellent ROI potential.';
+            } else if (valueScore >= 3.5 && riskScore > 2.5) {
+                priority = 2;
+                priorityColor = '#fbbf24';
+                recommendation = 'MEDIUM-HIGH PRIORITY: Proceed with careful planning. High value but manage risks through phased approach.';
+            } else if (valueScore < 3.5 && riskScore <= 2.5) {
+                priority = 3;
+                priorityColor = '#60a5fa';
+                recommendation = 'MEDIUM PRIORITY: Consider for future implementation. Low risk but limited value - good for learning.';
+            } else {
+                priority = 4;
+                priorityColor = '#f87171';
+                recommendation = 'LOW PRIORITY: Recommend deferral or cancellation. High risk, low value - requires significant reevaluation.';
+            }
+
+            // Update the results display
+            document.getElementById('valueScore').textContent = valueScore;
+            document.getElementById('riskScore').textContent = riskScore;
+            document.getElementById('finalScore').textContent = finalScore;
+            document.getElementById('priorityLevel').textContent = priority;
+            document.getElementById('priorityLevel').style.color = priorityColor;
+            document.getElementById('recommendation').textContent = recommendation;
+
+            // Show results section and apply button
+            document.getElementById('evaluationResults').style.display = 'block';
+            document.getElementById('applyEvalBtn').style.display = 'inline-flex';
+
+            // Store evaluation data for later use
+            window.currentEvaluation = {
+                valueScore: parseFloat(valueScore),
+                riskScore: parseFloat(riskScore),
+                finalScore: parseFloat(finalScore),
+                priority: priority,
+                recommendation: recommendation,
+                criteria: {
+                    revenueImpact,
+                    timeToValue,
+                    strategicAlignment,
+                    technicalComplexity,
+                    dataAvailability,
+                    resourceRequirements
+                }
+            };
+
+            showStatusMessage('Evaluation calculated successfully! You can now apply these scores to your project.', 'success');
+        }
+
+        function clearEvaluation() {
+            // Clear all evaluation form fields
+            document.getElementById('revenueImpact').value = '';
+            document.getElementById('timeToValue').value = '';
+            document.getElementById('strategicAlignment').value = '';
+            document.getElementById('technicalComplexity').value = '';
+            document.getElementById('dataAvailability').value = '';
+            document.getElementById('resourceRequirements').value = '';
+
+            // Hide results
+            document.getElementById('evaluationResults').style.display = 'none';
+            document.getElementById('applyEvalBtn').style.display = 'none';
+
+            // Clear stored evaluation
+            window.currentEvaluation = null;
+
+            showStatusMessage('Evaluation cleared', 'info');
+        }
+
+        function applyEvaluationToProject() {
+            if (!window.currentEvaluation) {
+                showStatusMessage('No evaluation data to apply', 'warning');
+                return;
+            }
+
+            if (!currentProjectId) {
+                showStatusMessage('Please select or create a project first', 'warning');
+                return;
+            }
+
+            // Apply evaluation scores to current project
+            const project = projects[currentProjectId] || {};
+            project.valueScore = window.currentEvaluation.valueScore;
+            project.riskScore = window.currentEvaluation.riskScore;
+            project.finalScore = window.currentEvaluation.finalScore;
+            project.priority = window.currentEvaluation.priority;
+            project.recommendation = window.currentEvaluation.recommendation;
+            project.evaluationCriteria = window.currentEvaluation.criteria;
+            project.evaluationDate = new Date().toISOString().split('T')[0];
+
+            // Save the updated project
+            projects[currentProjectId] = project;
+            
+            // Reload projects list to show updated scores
+            loadProjects();
+
+            showStatusMessage('Evaluation scores applied to project successfully!', 'success');
+        }
+        
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', () => {
+            loadProjects();
+        });
+    </script>
+</body>
+</html>

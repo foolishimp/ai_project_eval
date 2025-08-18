@@ -1,0 +1,1445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Project Proposal Builder</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f1419 100%);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header Section */
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 8s ease infinite;
+            padding: 20px 30px;
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+            flex-shrink: 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%);
+            animation: shimmer 3s linear infinite;
+            pointer-events: none;
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h1 {
+            color: white;
+            font-size: 28px;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+
+        .btn-primary:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: rgba(0, 255, 136, 0.15);
+            color: #86efac;
+            border: 2px solid rgba(0, 255, 136, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(0, 255, 136, 0.25);
+            border-color: rgba(0, 255, 136, 0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 255, 136, 0.3);
+        }
+
+        /* Main Layout */
+        .main-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 320px;
+            background: rgba(30, 30, 60, 0.9);
+            border-right: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sidebar-title {
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .new-project-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .new-project-btn:hover {
+            background: #218838;
+        }
+
+        .projects-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .project-item {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            margin-bottom: 10px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .project-item:hover {
+            border-color: rgba(102, 126, 234, 0.5);
+            box-shadow: 0 2px 10px rgba(102, 126, 234, 0.2);
+        }
+
+        .project-item.active {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .project-header {
+            padding: 15px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .project-name {
+            color: white;
+            font-weight: 600;
+            flex: 1;
+        }
+
+        .project-status {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .status-draft { background: #6c757d; color: white; }
+        .status-evaluated { background: #17a2b8; color: white; }
+        .status-approved { background: #28a745; color: white; }
+        .status-portfolio { background: rgba(0, 255, 136, 0.8); color: white; }
+
+        .project-icon {
+            margin-right: 8px;
+            font-size: 14px;
+        }
+
+        .expand-btn {
+            background: none;
+            border: none;
+            color: #667eea;
+            cursor: pointer;
+            font-size: 16px;
+            margin-left: 10px;
+            transition: transform 0.3s ease;
+        }
+
+        .expand-btn.expanded {
+            transform: rotate(180deg);
+        }
+
+        .project-details {
+            display: none;
+            padding: 0 15px 15px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .project-details.show {
+            display: block;
+        }
+
+        .evaluation-compact {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .eval-dimension {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 8px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .eval-label {
+            color: #aaa;
+        }
+
+        .eval-score {
+            color: white;
+            font-weight: 600;
+        }
+
+        .final-score {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 8px;
+            background: rgba(102, 126, 234, 0.2);
+            border-radius: 4px;
+            color: white;
+            font-weight: 600;
+        }
+
+        /* Main Content Area */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Tab Navigation */
+        .tab-nav {
+            display: flex;
+            background: rgba(30, 30, 60, 0.9);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 15px 20px;
+            background: none;
+            border: none;
+            color: #aaa;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            font-weight: 600;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab-btn:hover {
+            color: white;
+            background: rgba(255,255,255,0.05);
+        }
+
+        .tab-btn.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        /* Tab Content */
+        .tab-content {
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .tab-pane {
+            display: none;
+            height: 100%;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .tab-pane.active {
+            display: block;
+        }
+
+        /* Form Styles */
+        .form-section {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-label {
+            color: #ddd;
+            font-weight: 600;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .form-input, .form-textarea, .form-select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 6px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            font-size: 14px;
+        }
+
+        .form-input:focus, .form-textarea:focus, .form-select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+        }
+
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        /* Evaluation Tab Styles */
+        .evaluation-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .dimension-card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        .dimension-title {
+            color: white;
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .dimension-score {
+            background: #667eea;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .evaluation-results {
+            background: rgba(40, 167, 69, 0.1);
+            border: 1px solid rgba(40, 167, 69, 0.3);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .final-score-display {
+            font-size: 36px;
+            font-weight: 700;
+            color: #28a745;
+            margin-bottom: 10px;
+        }
+
+        .priority-display {
+            font-size: 18px;
+            font-weight: 600;
+            color: white;
+        }
+
+        /* Review Tab Styles */
+        .review-section {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .review-title {
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .review-content {
+            color: #ddd;
+            line-height: 1.6;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .btn-info {
+            background: #17a2b8;
+            color: white;
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.1);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(102, 126, 234, 0.5);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(102, 126, 234, 0.7);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1>AI Project Proposal Builder</h1>
+            <div class="header-controls">
+                <button class="btn btn-secondary" onclick="openPortfolioAnalytics()">
+                    <span>📊</span> Portfolio Analytics
+                </button>
+                <button class="btn btn-success" onclick="saveToPortfolio()">
+                    <span>💾</span> Save to Portfolio
+                </button>
+                <a href="evaluation_form.html" class="btn btn-primary">Quick Evaluation</a>
+                <button class="btn btn-primary" onclick="exportProject()">Export</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-title">Projects</div>
+                <button class="new-project-btn" onclick="createNewProject()">+ New</button>
+            </div>
+            <div class="projects-list" id="projectsList">
+                <!-- Projects will be dynamically loaded here -->
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Tab Navigation -->
+            <div class="tab-nav">
+                <button class="tab-btn active" onclick="switchTab('proposal')">Proposal</button>
+                <button class="tab-btn" onclick="switchTab('evaluation')">Evaluation</button>
+                <button class="tab-btn" onclick="switchTab('review')">Review</button>
+            </div>
+
+            <!-- Tab Content -->
+            <div class="tab-content">
+                <!-- Proposal Tab -->
+                <div id="proposal-tab" class="tab-pane active">
+                    <div class="form-section">
+                        <div class="section-title">Project Overview</div>
+                        <div class="form-group">
+                            <label class="form-label">Project Name</label>
+                            <input type="text" class="form-input" id="projectName" placeholder="Enter project name">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Department/Team</label>
+                            <input type="text" class="form-input" id="department" placeholder="Originating team or department">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Executive Summary</label>
+                            <textarea class="form-textarea" id="executiveSummary" placeholder="2-3 sentences describing the problem and proposed AI solution"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <div class="section-title">Problem Definition</div>
+                        <div class="form-group">
+                            <label class="form-label">Current Process</label>
+                            <textarea class="form-textarea" id="currentProcess" placeholder="Detailed description of the existing workflow, process, or challenge"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Pain Points</label>
+                            <textarea class="form-textarea" id="painPoints" placeholder="List specific inefficiencies, costs, and quality issues"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <div class="section-title">Proposed AI Solution</div>
+                        <div class="form-group">
+                            <label class="form-label">Solution Type</label>
+                            <select class="form-select" id="solutionType">
+                                <option value="">Select solution type</option>
+                                <option value="Content Generation & Transformation">Content Generation & Transformation</option>
+                                <option value="Classification & Analysis">Classification & Analysis</option>
+                                <option value="Intelligent Search & Retrieval">Intelligent Search & Retrieval</option>
+                                <option value="Data Extraction & Structuring">Data Extraction & Structuring</option>
+                                <option value="Conversational Interfaces & Assistance">Conversational Interfaces & Assistance</option>
+                                <option value="Code & Technical Assistance">Code & Technical Assistance</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Implementation Strategy</label>
+                            <select class="form-select" id="implementationStrategy">
+                                <option value="">Select implementation strategy</option>
+                                <option value="Strategy 1: Direct Prompting">Strategy 1: Direct Prompting & Manual Results Usage</option>
+                                <option value="Strategy 2: Formalized Assets">Strategy 2: Formalized Asset Building (SDLC Approach)</option>
+                                <option value="Strategy 3: Live Production">Strategy 3: Live LLM in Production</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Core Capabilities</label>
+                            <textarea class="form-textarea" id="coreCapabilities" placeholder="List key features and capabilities"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <div class="section-title">Expected Outcomes</div>
+                        <div class="form-group">
+                            <label class="form-label">Success Metrics</label>
+                            <textarea class="form-textarea" id="successMetrics" placeholder="Primary and secondary metrics for measuring success"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Expected Benefits</label>
+                            <textarea class="form-textarea" id="expectedBenefits" placeholder="Quantified benefits in relative terms (efficiency gains, competitive advantages)"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Evaluation Tab -->
+                <div id="evaluation-tab" class="tab-pane">
+                    <div class="evaluation-grid">
+                        <div class="dimension-card">
+                            <div class="dimension-title">
+                                Technical Complexity
+                                <span class="dimension-score" id="techScore">-</span>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Technology Type</label>
+                                <select class="form-select" id="technologyType" onchange="calculateEvaluation()">
+                                    <option value="1">Existing APIs/Standard Libraries</option>
+                                    <option value="2">Minor Customization</option>
+                                    <option value="3">Custom Development</option>
+                                    <option value="4">Cutting-edge Technology</option>
+                                    <option value="5">Experimental/Research-level</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">System Integrations</label>
+                                <input type="number" class="form-input" id="integrations" min="0" max="20" value="0" onchange="calculateEvaluation()">
+                            </div>
+                        </div>
+
+                        <div class="dimension-card">
+                            <div class="dimension-title">
+                                Resource Requirements
+                                <span class="dimension-score" id="resourceScore">-</span>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Team Size</label>
+                                <input type="number" class="form-input" id="teamSize" min="1" max="20" value="3" onchange="calculateEvaluation()">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Infrastructure Level</label>
+                                <select class="form-select" id="infrastructureLevel" onchange="calculateEvaluation()">
+                                    <option value="1">Use Existing</option>
+                                    <option value="2">Minor Additions</option>
+                                    <option value="3">Moderate New</option>
+                                    <option value="4">Significant Changes</option>
+                                    <option value="5">Major Overhaul</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="dimension-card">
+                            <div class="dimension-title">
+                                Implementation Risk
+                                <span class="dimension-score" id="riskScore">-</span>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Regulatory Requirements</label>
+                                <select class="form-select" id="regulatoryLevel" onchange="calculateEvaluation()">
+                                    <option value="1">None</option>
+                                    <option value="2">Minor Compliance</option>
+                                    <option value="3">Some Oversight</option>
+                                    <option value="4">Significant Requirements</option>
+                                    <option value="5">Heavy Oversight</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">User Adoption Challenge</label>
+                                <select class="form-select" id="userAdoption" onchange="calculateEvaluation()">
+                                    <option value="1">High Acceptance</option>
+                                    <option value="2">Good Buy-in</option>
+                                    <option value="3">Moderate Change</option>
+                                    <option value="4">Substantial Resistance</option>
+                                    <option value="5">High Resistance</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="dimension-card">
+                            <div class="dimension-title">
+                                Business Impact
+                                <span class="dimension-score" id="businessScore">-</span>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Operational Improvement</label>
+                                <select class="form-select" id="operationalImprovement" onchange="calculateEvaluation()">
+                                    <option value="1">Minimal Gains</option>
+                                    <option value="2">Modest Productivity</option>
+                                    <option value="3">Noticeable Improvement</option>
+                                    <option value="4">Significant Transformation</option>
+                                    <option value="5">Revolutionary Change</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Impact Scope</label>
+                                <select class="form-select" id="impactScope" onchange="calculateEvaluation()">
+                                    <option value="1">Single Team</option>
+                                    <option value="2">Department</option>
+                                    <option value="3">Multi-Department</option>
+                                    <option value="4">Organization-wide</option>
+                                    <option value="5">Industry Level</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="dimension-card">
+                            <div class="dimension-title">
+                                Scalability Potential
+                                <span class="dimension-score" id="scalabilityScore">-</span>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Reusability</label>
+                                <select class="form-select" id="reusability" onchange="calculateEvaluation()">
+                                    <option value="1">Single Use</option>
+                                    <option value="2">Few Similar</option>
+                                    <option value="3">Multiple Related</option>
+                                    <option value="4">Cross-functional</option>
+                                    <option value="5">Platform Potential</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Extension Capability</label>
+                                <select class="form-select" id="extensionCapability" onchange="calculateEvaluation()">
+                                    <option value="1">Difficult</option>
+                                    <option value="2">Minor Possible</option>
+                                    <option value="3">Moderate</option>
+                                    <option value="4">High Capable</option>
+                                    <option value="5">Exponential Scaling</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="dimension-card">
+                            <div class="dimension-title">
+                                Implementation Timeline
+                                <span class="dimension-score" id="timelineScore">-</span>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Development Cycle</label>
+                                <select class="form-select" id="developmentCycle" onchange="calculateEvaluation()">
+                                    <option value="5">Immediate</option>
+                                    <option value="4">Rapid</option>
+                                    <option value="3">Standard</option>
+                                    <option value="2">Long</option>
+                                    <option value="1">Extended</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Deployment Complexity</label>
+                                <select class="form-select" id="deploymentComplexity" onchange="calculateEvaluation()">
+                                    <option value="5">Instant</option>
+                                    <option value="4">Quick</option>
+                                    <option value="3">Phased</option>
+                                    <option value="2">Gradual</option>
+                                    <option value="1">Complex</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="evaluation-results" id="evaluationResults" style="display: none;">
+                        <div class="final-score-display" id="finalScore">0.00</div>
+                        <div class="priority-display" id="priorityLevel">Calculate evaluation to see results</div>
+                        <div style="margin-top: 15px; display: flex; justify-content: space-around; color: #ddd;">
+                            <div>Risk Score: <span id="riskScoreDisplay">-</span></div>
+                            <div>Value Score: <span id="valueScoreDisplay">-</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Review Tab -->
+                <div id="review-tab" class="tab-pane">
+                    <div class="review-section">
+                        <div class="review-title">Project Overview</div>
+                        <div class="review-content" id="reviewOverview">
+                            Complete the proposal form to see the review summary.
+                        </div>
+                    </div>
+
+                    <div class="review-section">
+                        <div class="review-title">Solution Summary</div>
+                        <div class="review-content" id="reviewSolution">
+                            Complete the proposal form to see the solution summary.
+                        </div>
+                    </div>
+
+                    <div class="review-section">
+                        <div class="review-title">Evaluation Summary</div>
+                        <div class="review-content" id="reviewEvaluation">
+                            Complete the evaluation to see the assessment summary.
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="btn btn-success" onclick="saveProject()">Save Project</button>
+                        <button class="btn btn-warning" onclick="generateProposal()">Generate Full Proposal</button>
+                        <button class="btn btn-info" onclick="exportEvaluation()">Export Evaluation</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global state
+        let currentProjectId = null;
+        let projects = JSON.parse(localStorage.getItem('aiProjects') || '[]');
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            loadProjects();
+            calculateEvaluation();
+            updateReview();
+        });
+
+        // Tab switching
+        function switchTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Update tab content
+            document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+            document.getElementById(tabName + '-tab').classList.add('active');
+
+            // Update review if switching to review tab
+            if (tabName === 'review') {
+                updateReview();
+            }
+        }
+
+        // Project management
+        function createNewProject() {
+            const projectId = 'project_' + Date.now();
+            const newProject = {
+                id: projectId,
+                name: 'New Project',
+                status: 'draft',
+                createdDate: new Date().toISOString(),
+                data: {}
+            };
+
+            projects.push(newProject);
+            localStorage.setItem('aiProjects', JSON.stringify(projects));
+            
+            currentProjectId = projectId;
+            loadProjects();
+            clearForm();
+        }
+
+        async function loadProjects() {
+            const projectsList = document.getElementById('projectsList');
+            projectsList.innerHTML = '<div style="padding: 20px; text-align: center; color: #aaa;">Loading projects...</div>';
+
+            try {
+                // Load projects from server API
+                const response = await fetch('http://localhost:8100/api/projects');
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success && data.projects) {
+                        // Convert server projects to local format and merge with existing local projects
+                        const serverProjects = data.projects.map(serverProject => ({
+                            id: serverProject.id,
+                            name: serverProject.name,
+                            description: serverProject.description,
+                            submitter: serverProject.submitter,
+                            department: serverProject.department,
+                            date: serverProject.date,
+                            priority: serverProject.priority,
+                            finalScore: serverProject.finalScore,
+                            riskScore: serverProject.riskScore,
+                            valueScore: serverProject.valueScore,
+                            category: serverProject.category,
+                            strategy: serverProject.strategy,
+                            status: 'server', // Mark as server-sourced
+                            source: 'portfolio'
+                        }));
+
+                        // Merge server projects with local projects
+                        const allProjects = [...Object.values(projects), ...serverProjects];
+                        
+                        projectsList.innerHTML = '';
+                        
+                        if (allProjects.length === 0) {
+                            projectsList.innerHTML = `
+                                <div style="padding: 20px; text-align: center; color: #aaa;">
+                                    <p>No projects found</p>
+                                    <button class="btn btn-primary" onclick="createNewProject()" style="margin-top: 10px;">
+                                        Create Your First Project
+                                    </button>
+                                </div>
+                            `;
+                            return;
+                        }
+
+                        // Sort projects by date (newest first)
+                        allProjects.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
+
+                        allProjects.forEach(project => {
+                            const projectElement = createProjectElement(project);
+                            projectsList.appendChild(projectElement);
+                        });
+                    }
+                } else {
+                    throw new Error('Server not available');
+                }
+            } catch (error) {
+                console.warn('Could not load projects from server:', error.message);
+                // Fallback to local projects only
+                projectsList.innerHTML = '';
+                
+                const localProjects = Object.values(projects);
+                if (localProjects.length === 0) {
+                    projectsList.innerHTML = `
+                        <div style="padding: 20px; text-align: center; color: #aaa;">
+                            <p>No projects found</p>
+                            <p style="font-size: 12px; margin-top: 8px;">Server offline - showing local projects only</p>
+                            <button class="btn btn-primary" onclick="createNewProject()" style="margin-top: 10px;">
+                                Create Your First Project
+                            </button>
+                        </div>
+                    `;
+                } else {
+                    localProjects.forEach(project => {
+                        const projectElement = createProjectElement(project);
+                        projectsList.appendChild(projectElement);
+                    });
+                }
+            }
+        }
+
+        function createProjectElement(project) {
+            const div = document.createElement('div');
+            div.className = `project-item ${project.id === currentProjectId ? 'active' : ''}`;
+            
+            // Determine status and styling based on project source
+            let statusClass, statusText, sourceIcon;
+            if (project.source === 'portfolio') {
+                statusClass = 'status-portfolio';
+                statusText = project.name.startsWith('[Example]') ? 'Example' : 'Portfolio';
+                sourceIcon = project.name.startsWith('[Example]') ? '📚' : '📊';
+            } else {
+                statusClass = project.status === 'draft' ? 'status-draft' : 
+                             project.status === 'evaluated' ? 'status-evaluated' : 'status-approved';
+                statusText = project.status || 'draft';
+                sourceIcon = '📝';
+            }
+
+            div.innerHTML = `
+                <div class="project-header" onclick="selectProject('${project.id}')">
+                    <div class="project-name">
+                        <span class="project-icon">${sourceIcon}</span>
+                        ${project.name || 'Untitled Project'}
+                    </div>
+                    <div class="project-status ${statusClass}">${statusText}</div>
+                    <button class="expand-btn" onclick="event.stopPropagation(); toggleProjectDetails('${project.id}')">▼</button>
+                </div>
+                <div class="project-details" id="details-${project.id}">
+                    ${createProjectDetails(project)}
+                </div>
+            `;
+
+            return div;
+        }
+
+        function createProjectDetails(project) {
+            // Handle server projects (from portfolio)
+            if (project.source === 'portfolio') {
+                return `
+                    <div class="evaluation-compact">
+                        <div class="project-info" style="margin-bottom: 15px;">
+                            <div style="margin-bottom: 8px;">
+                                <span style="color: #999; font-size: 12px;">Submitter:</span>
+                                <span style="color: #e0e0e0; margin-left: 8px;">${project.submitter || 'Unknown'}</span>
+                            </div>
+                            <div style="margin-bottom: 8px;">
+                                <span style="color: #999; font-size: 12px;">Department:</span>
+                                <span style="color: #e0e0e0; margin-left: 8px;">${project.department || 'Unknown'}</span>
+                            </div>
+                            <div style="margin-bottom: 8px;">
+                                <span style="color: #999; font-size: 12px;">Category:</span>
+                                <span style="color: #e0e0e0; margin-left: 8px;">${project.category || 'Unknown'}</span>
+                            </div>
+                        </div>
+                        <div class="eval-scores" style="border-top: 1px solid #333; padding-top: 15px;">
+                            <div class="eval-dimension">
+                                <span class="eval-label">Risk Score</span>
+                                <span class="eval-score">${(project.riskScore || 0).toFixed(2)}</span>
+                            </div>
+                            <div class="eval-dimension">
+                                <span class="eval-label">Value Score</span>
+                                <span class="eval-score">${(project.valueScore || 0).toFixed(2)}</span>
+                            </div>
+                            <div class="final-score">
+                                Final Score: ${(project.finalScore || 0).toFixed(2)} | Priority ${project.priority || 'Unknown'}
+                            </div>
+                        </div>
+                        ${project.description ? `
+                            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #333;">
+                                <div style="color: #999; font-size: 12px; margin-bottom: 8px;">Description:</div>
+                                <div style="color: #ccc; font-size: 13px; line-height: 1.4;">
+                                    ${project.description.substring(0, 200)}${project.description.length > 200 ? '...' : ''}
+                                </div>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }
+
+            // Handle local projects with evaluation data
+            if (!project.evaluation) {
+                return `
+                    <div style="color: #aaa; text-align: center; padding: 10px;">
+                        <p>No evaluation data</p>
+                        <button class="btn btn-info" onclick="switchTab('evaluation')" style="margin-top: 8px; font-size: 12px; padding: 6px 12px;">
+                            Add Evaluation
+                        </button>
+                    </div>
+                `;
+            }
+
+            const eval = project.evaluation;
+            return `
+                <div class="evaluation-compact">
+                    <div class="eval-dimension">
+                        <span class="eval-label">Technical</span>
+                        <span class="eval-score">${eval.technical || '-'}</span>
+                    </div>
+                    <div class="eval-dimension">
+                        <span class="eval-label">Resources</span>
+                        <span class="eval-score">${eval.resources || '-'}</span>
+                    </div>
+                    <div class="eval-dimension">
+                        <span class="eval-label">Risk</span>
+                        <span class="eval-score">${eval.risk || '-'}</span>
+                    </div>
+                    <div class="eval-dimension">
+                        <span class="eval-label">Business</span>
+                        <span class="eval-score">${eval.business || '-'}</span>
+                    </div>
+                    <div class="eval-dimension">
+                        <span class="eval-label">Scalability</span>
+                        <span class="eval-score">${eval.scalability || '-'}</span>
+                    </div>
+                    <div class="eval-dimension">
+                        <span class="eval-label">Timeline</span>
+                        <span class="eval-score">${eval.timeline || '-'}</span>
+                    </div>
+                    <div class="final-score">
+                        Final Score: ${eval.finalScore || '-'} | ${eval.priority || 'Not Evaluated'}
+                    </div>
+                </div>
+            `;
+        }
+
+        function toggleProjectDetails(projectId) {
+            const details = document.getElementById(`details-${projectId}`);
+            const btn = event.target;
+            
+            if (details.classList.contains('show')) {
+                details.classList.remove('show');
+                btn.classList.remove('expanded');
+            } else {
+                details.classList.add('show');
+                btn.classList.add('expanded');
+            }
+        }
+
+        function selectProject(projectId) {
+            currentProjectId = projectId;
+            loadProjects();
+            loadProjectData();
+        }
+
+        function loadProjectData() {
+            if (!currentProjectId) return;
+
+            const project = projects.find(p => p.id === currentProjectId);
+            if (!project || !project.data) return;
+
+            const data = project.data;
+
+            // Load form data
+            document.getElementById('projectName').value = data.projectName || '';
+            document.getElementById('department').value = data.department || '';
+            document.getElementById('executiveSummary').value = data.executiveSummary || '';
+            document.getElementById('currentProcess').value = data.currentProcess || '';
+            document.getElementById('painPoints').value = data.painPoints || '';
+            document.getElementById('solutionType').value = data.solutionType || '';
+            document.getElementById('implementationStrategy').value = data.implementationStrategy || '';
+            document.getElementById('coreCapabilities').value = data.coreCapabilities || '';
+            document.getElementById('successMetrics').value = data.successMetrics || '';
+            document.getElementById('expectedBenefits').value = data.expectedBenefits || '';
+
+            // Load evaluation data
+            if (data.evaluation) {
+                const eval = data.evaluation;
+                document.getElementById('technologyType').value = eval.technologyType || '1';
+                document.getElementById('integrations').value = eval.integrations || '0';
+                document.getElementById('teamSize').value = eval.teamSize || '3';
+                document.getElementById('infrastructureLevel').value = eval.infrastructureLevel || '1';
+                document.getElementById('regulatoryLevel').value = eval.regulatoryLevel || '1';
+                document.getElementById('userAdoption').value = eval.userAdoption || '1';
+                document.getElementById('operationalImprovement').value = eval.operationalImprovement || '1';
+                document.getElementById('impactScope').value = eval.impactScope || '1';
+                document.getElementById('reusability').value = eval.reusability || '1';
+                document.getElementById('extensionCapability').value = eval.extensionCapability || '1';
+                document.getElementById('developmentCycle').value = eval.developmentCycle || '3';
+                document.getElementById('deploymentComplexity').value = eval.deploymentComplexity || '3';
+                
+                calculateEvaluation();
+            }
+        }
+
+        function clearForm() {
+            document.querySelectorAll('.form-input, .form-textarea, .form-select').forEach(element => {
+                element.value = '';
+            });
+            calculateEvaluation();
+        }
+
+        // Evaluation calculation
+        function calculateEvaluation() {
+            const technical = Math.round((
+                parseInt(document.getElementById('technologyType').value) +
+                Math.min(5, Math.max(1, Math.ceil(parseInt(document.getElementById('integrations').value) / 2) + 1))
+            ) / 2);
+
+            const resources = Math.round((
+                Math.min(5, Math.max(1, Math.ceil(parseInt(document.getElementById('teamSize').value) / 2))) +
+                parseInt(document.getElementById('infrastructureLevel').value)
+            ) / 2);
+
+            const risk = Math.round((
+                parseInt(document.getElementById('regulatoryLevel').value) +
+                parseInt(document.getElementById('userAdoption').value)
+            ) / 2);
+
+            const business = Math.round((
+                parseInt(document.getElementById('operationalImprovement').value) +
+                parseInt(document.getElementById('impactScope').value)
+            ) / 2);
+
+            const scalability = Math.round((
+                parseInt(document.getElementById('reusability').value) +
+                parseInt(document.getElementById('extensionCapability').value)
+            ) / 2);
+
+            const timeline = Math.round((
+                parseInt(document.getElementById('developmentCycle').value) +
+                parseInt(document.getElementById('deploymentComplexity').value)
+            ) / 2);
+
+            // Update dimension scores
+            document.getElementById('techScore').textContent = technical;
+            document.getElementById('resourceScore').textContent = resources;
+            document.getElementById('riskScore').textContent = risk;
+            document.getElementById('businessScore').textContent = business;
+            document.getElementById('scalabilityScore').textContent = scalability;
+            document.getElementById('timelineScore').textContent = timeline;
+
+            // Calculate weighted scores
+            const riskScore = (technical * 0.375 + resources * 0.375 + risk * 0.25);
+            const valueScore = (business * 0.417 + scalability * 0.333 + timeline * 0.25);
+            const finalScore = (valueScore * 0.6 - riskScore * 0.4);
+
+            // Determine priority
+            let priority, priorityClass;
+            if (valueScore >= 4.0 && riskScore <= 2.5) {
+                priority = "Priority 1 - Immediate implementation";
+                priorityClass = "priority-1";
+            } else if (valueScore >= 4.0 && riskScore <= 3.5) {
+                priority = "Priority 2 - Detailed planning required";
+                priorityClass = "priority-2";
+            } else if (valueScore >= 4.0) {
+                priority = "Priority 2 - Risk mitigation planning";
+                priorityClass = "priority-2";
+            } else if (valueScore >= 3.0 && riskScore <= 2.5) {
+                priority = "Priority 3 - Quick wins consideration";
+                priorityClass = "priority-3";
+            } else {
+                priority = "Priority 4 - Defer or reject";
+                priorityClass = "priority-4";
+            }
+
+            // Update display
+            document.getElementById('finalScore').textContent = finalScore.toFixed(2);
+            document.getElementById('priorityLevel').textContent = priority;
+            document.getElementById('riskScoreDisplay').textContent = riskScore.toFixed(2);
+            document.getElementById('valueScoreDisplay').textContent = valueScore.toFixed(2);
+            document.getElementById('evaluationResults').style.display = 'block';
+
+            // Save evaluation to current project
+            if (currentProjectId) {
+                const project = projects.find(p => p.id === currentProjectId);
+                if (project) {
+                    project.evaluation = {
+                        technical, resources, risk, business, scalability, timeline,
+                        riskScore: riskScore.toFixed(2),
+                        valueScore: valueScore.toFixed(2),
+                        finalScore: finalScore.toFixed(2),
+                        priority: priority.split(' - ')[0]
+                    };
+                    project.status = 'evaluated';
+                    localStorage.setItem('aiProjects', JSON.stringify(projects));
+                    loadProjects();
+                }
+            }
+        }
+
+        // Review update
+        function updateReview() {
+            const projectName = document.getElementById('projectName').value;
+            const department = document.getElementById('department').value;
+            const executiveSummary = document.getElementById('executiveSummary').value;
+            const solutionType = document.getElementById('solutionType').value;
+            const implementationStrategy = document.getElementById('implementationStrategy').value;
+
+            document.getElementById('reviewOverview').innerHTML = `
+                <strong>Project:</strong> ${projectName || 'Untitled Project'}<br>
+                <strong>Department:</strong> ${department || 'Not specified'}<br>
+                <strong>Summary:</strong> ${executiveSummary || 'No summary provided'}
+            `;
+
+            document.getElementById('reviewSolution').innerHTML = `
+                <strong>Solution Type:</strong> ${solutionType || 'Not selected'}<br>
+                <strong>Implementation Strategy:</strong> ${implementationStrategy || 'Not selected'}
+            `;
+
+            const finalScore = document.getElementById('finalScore').textContent;
+            const priority = document.getElementById('priorityLevel').textContent;
+            
+            document.getElementById('reviewEvaluation').innerHTML = `
+                <strong>Final Score:</strong> ${finalScore}<br>
+                <strong>Priority:</strong> ${priority}
+            `;
+        }
+
+        // Save and export functions
+        function saveProject() {
+            if (!currentProjectId) {
+                createNewProject();
+            }
+
+            const project = projects.find(p => p.id === currentProjectId);
+            if (!project) return;
+
+            // Save form data
+            project.data = {
+                projectName: document.getElementById('projectName').value,
+                department: document.getElementById('department').value,
+                executiveSummary: document.getElementById('executiveSummary').value,
+                currentProcess: document.getElementById('currentProcess').value,
+                painPoints: document.getElementById('painPoints').value,
+                solutionType: document.getElementById('solutionType').value,
+                implementationStrategy: document.getElementById('implementationStrategy').value,
+                coreCapabilities: document.getElementById('coreCapabilities').value,
+                successMetrics: document.getElementById('successMetrics').value,
+                expectedBenefits: document.getElementById('expectedBenefits').value,
+                evaluation: {
+                    technologyType: document.getElementById('technologyType').value,
+                    integrations: document.getElementById('integrations').value,
+                    teamSize: document.getElementById('teamSize').value,
+                    infrastructureLevel: document.getElementById('infrastructureLevel').value,
+                    regulatoryLevel: document.getElementById('regulatoryLevel').value,
+                    userAdoption: document.getElementById('userAdoption').value,
+                    operationalImprovement: document.getElementById('operationalImprovement').value,
+                    impactScope: document.getElementById('impactScope').value,
+                    reusability: document.getElementById('reusability').value,
+                    extensionCapability: document.getElementById('extensionCapability').value,
+                    developmentCycle: document.getElementById('developmentCycle').value,
+                    deploymentComplexity: document.getElementById('deploymentComplexity').value
+                }
+            };
+
+            project.name = project.data.projectName || 'Untitled Project';
+            project.lastModified = new Date().toISOString();
+
+            localStorage.setItem('aiProjects', JSON.stringify(projects));
+            loadProjects();
+            
+            alert('Project saved successfully!');
+        }
+
+        function generateProposal() {
+            if (!currentProjectId) {
+                alert('Please select a project first.');
+                return;
+            }
+
+            // This would generate a full proposal document
+            alert('Full proposal generation feature coming soon!');
+        }
+
+        function exportEvaluation() {
+            if (!currentProjectId) {
+                alert('Please select a project first.');
+                return;
+            }
+
+            const project = projects.find(p => p.id === currentProjectId);
+            if (!project) return;
+
+            const data = {
+                project: project.name,
+                evaluation: project.evaluation,
+                exportDate: new Date().toISOString()
+            };
+
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${project.name.replace(/\s+/g, '_')}_evaluation.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function exportProject() {
+            if (!currentProjectId) {
+                alert('Please select a project first.');
+                return;
+            }
+
+            const project = projects.find(p => p.id === currentProjectId);
+            if (!project) return;
+
+            const blob = new Blob([JSON.stringify(project, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${project.name.replace(/\s+/g, '_')}_project.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Navigation functions
+        function openPortfolioAnalytics() {
+            // Open portfolio analytics in new tab so user can keep builder open
+            window.open('project_portfolio_dashboard.html', '_blank');
+        }
+
+        // Save project to portfolio server
+        async function saveToPortfolio() {
+            if (!currentProjectId) {
+                alert('Please create or select a project first');
+                return;
+            }
+
+            const project = projects[currentProjectId];
+            if (!project) {
+                alert('Project data not found');
+                return;
+            }
+
+            // Show loading state
+            const saveButton = document.querySelector('button[onclick="saveToPortfolio()"]');
+            const originalText = saveButton.innerHTML;
+            saveButton.innerHTML = '<span>⏳</span> Saving...';
+            saveButton.disabled = true;
+
+            try {
+                // Prepare project data for server
+                const projectData = {
+                    name: project.name || 'Untitled Project',
+                    submitter: project.submitter || 'Project Builder User',
+                    department: project.department || 'Unknown',
+                    description: project.description || 'No description provided',
+                    category: project.category || 'Unknown',
+                    strategy: project.strategy || 'To be determined',
+                    riskScore: project.riskScore || 2.5,
+                    valueScore: project.valueScore || 2.5,
+                    finalScore: project.finalScore || 0,
+                    priority: project.priority || 3,
+                    recommendation: getRecommendationFromScore(project.finalScore || 0),
+                    // Additional fields from form
+                    currentProcess: project.currentProcess || 'To be documented',
+                    painPoints: project.painPoints || 'To be identified',
+                    technologyApproach: project.technologyApproach || 'To be defined',
+                    capabilities: project.capabilities || 'To be defined',
+                    successMetrics: project.successMetrics || 'To be defined',
+                    benefits: project.benefits || 'To be quantified',
+                    dataRequirements: project.dataRequirements || 'To be analyzed',
+                    technicalIntegration: project.technicalIntegration || 'To be planned',
+                    teamRequirements: project.teamRequirements || 'To be determined',
+                    budgetEstimate: project.budgetEstimate || 'To be estimated',
+                    technicalRisks: project.technicalRisks || 'To be assessed',
+                    businessRisks: project.businessRisks || 'To be assessed',
+                    evaluationSummary: `Project created via Project Builder with final score of ${project.finalScore || 0}`
+                };
+
+                // Send to server
+                const response = await fetch('http://localhost:8100/api/projects', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(projectData)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    alert(`✅ Project saved to portfolio successfully!\n\nProject ID: ${result.projectId}\n\nYou can now view it in the Portfolio Analytics dashboard.`);
+                    
+                    // Optionally open portfolio analytics to show the new project
+                    const openPortfolio = confirm('Would you like to open the Portfolio Analytics to see your new project?');
+                    if (openPortfolio) {
+                        openPortfolioAnalytics();
+                    }
+                } else {
+                    throw new Error(result.error || 'Failed to save project');
+                }
+            } catch (error) {
+                console.error('Error saving to portfolio:', error);
+                alert(`❌ Failed to save project to portfolio:\n\n${error.message}\n\nPlease check that the portfolio server is running.`);
+            } finally {
+                // Restore button state
+                saveButton.innerHTML = originalText;
+                saveButton.disabled = false;
+            }
+        }
+
+        // Helper function to get recommendation based on score
+        function getRecommendationFromScore(score) {
+            if (score >= 1.5) return 'Immediate implementation recommended';
+            if (score >= 0.8) return 'Approve with detailed planning required';
+            if (score >= 0.2) return 'Consider for implementation';
+            return 'Risk mitigation planning required';
+        }
+
+        // Auto-save functionality
+        setInterval(() => {
+            if (currentProjectId) {
+                saveProject();
+            }
+        }, 30000); // Auto-save every 30 seconds
+    </script>
+</body>
+</html>

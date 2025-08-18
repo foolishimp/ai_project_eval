@@ -1,0 +1,1361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Project Portfolio Analytics Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0a;
+            color: #e0e0e0;
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        .analytics-header {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .analytics-header h1 {
+            color: #00ff88;
+            font-size: 2.5em;
+            text-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+            margin: 0;
+        }
+
+        .analytics-header .subtitle {
+            font-size: 16px;
+            opacity: 0.9;
+            color: rgba(255,255,255,0.9);
+        }
+
+        .header-navigation {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .nav-button {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-button:hover {
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 255, 136, 0.3);
+        }
+
+        .nav-button.secondary {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-button.secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Main Layout */
+        .analytics-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .main-container {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 20px;
+            min-height: calc(100vh - 100px);
+        }
+
+        /* Sidebar Controls */
+        .sidebar {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 20px;
+            height: fit-content;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .control-section {
+            margin-bottom: 25px;
+        }
+
+        .control-section h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #00ff88;
+            border-bottom: 2px solid rgba(0, 255, 136, 0.3);
+            padding-bottom: 8px;
+        }
+
+        .filter-group {
+            margin-bottom: 15px;
+        }
+
+        .filter-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: #b0b0b0;
+        }
+
+        .filter-checkbox {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            padding: 8px;
+            border-radius: 6px;
+            transition: background-color 0.2s;
+        }
+
+        .filter-checkbox:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .filter-checkbox input[type="checkbox"] {
+            margin-right: 10px;
+            accent-color: #00ff88;
+        }
+
+        .filter-checkbox span {
+            font-size: 13px;
+            color: #d0d0d0;
+        }
+
+        .priority-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
+        .priority-1 { background: #22c55e; color: white; }
+        .priority-2 { background: #3b82f6; color: white; }
+        .priority-3 { background: #f59e0b; color: white; }
+        .priority-4 { background: #ef4444; color: white; }
+
+        /* Main Analytics Area */
+        .analytics-area {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Portfolio Overview Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: #2a2a2a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 3em;
+            font-weight: bold;
+            color: #00ff88;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 1.1em;
+            color: #999;
+        }
+
+        /* 4-Quadrant Risk/Value Matrix */
+        .quadrant-container {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+
+        .quadrant-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .quadrant-header h2 {
+            font-size: 1.8em;
+            color: #00ff88;
+            margin-bottom: 8px;
+        }
+
+        .quadrant-header p {
+            color: #b0b0b0;
+            font-size: 14px;
+        }
+
+        .risk-value-matrix {
+            position: relative;
+            width: 100%;
+            height: 500px;
+            background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+            border-radius: 8px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Quadrant Labels */
+        .quadrant-label {
+            position: absolute;
+            font-size: 14px;
+            font-weight: 600;
+            padding: 8px 12px;
+            border-radius: 6px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .quadrant-label.high-value-low-risk {
+            top: 10px;
+            left: 10px;
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+        }
+
+        .quadrant-label.high-value-high-risk {
+            top: 10px;
+            right: 10px;
+            background: rgba(251, 191, 36, 0.2);
+            color: #fbbf24;
+        }
+
+        .quadrant-label.low-value-low-risk {
+            bottom: 10px;
+            left: 10px;
+            background: rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
+        }
+
+        .quadrant-label.low-value-high-risk {
+            bottom: 10px;
+            right: 10px;
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        /* Axis Lines */
+        .axis-line {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .axis-line.vertical {
+            left: 50%;
+            top: 0;
+            width: 2px;
+            height: 100%;
+            transform: translateX(-50%);
+        }
+
+        .axis-line.horizontal {
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            transform: translateY(-50%);
+        }
+
+        /* Axis Labels */
+        .axis-label {
+            position: absolute;
+            font-size: 12px;
+            font-weight: 500;
+            color: #9ca3af;
+        }
+
+        .axis-label.x-axis {
+            bottom: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .axis-label.y-axis {
+            left: -80px;
+            top: 50%;
+            transform: translateY(-50%) rotate(-90deg);
+        }
+
+        .axis-label.x-low {
+            bottom: -20px;
+            left: 10px;
+        }
+
+        .axis-label.x-high {
+            bottom: -20px;
+            right: 10px;
+        }
+
+        .axis-label.y-low {
+            left: -60px;
+            bottom: 10px;
+        }
+
+        .axis-label.y-high {
+            left: -60px;
+            top: 10px;
+        }
+
+        /* Project Dots */
+        .project-dot {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 2px solid white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .project-dot:hover {
+            transform: scale(1.5);
+            border-width: 3px;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+
+        .project-dot.priority-1 { background-color: #22c55e; }
+        .project-dot.priority-2 { background-color: #3b82f6; }
+        .project-dot.priority-3 { background-color: #f59e0b; }
+        .project-dot.priority-4 { background-color: #ef4444; }
+
+        /* Project List */
+        .project-list-container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .project-list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .project-list-header h3 {
+            font-size: 20px;
+            color: #ffffff;
+        }
+
+        .sort-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .sort-controls select {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            padding: 8px 12px;
+            color: #e0e0e0;
+            font-size: 14px;
+        }
+
+        .project-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .project-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(102, 126, 234, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .project-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .project-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 4px;
+        }
+
+        .project-meta {
+            font-size: 12px;
+            color: #9ca3af;
+        }
+
+        .project-scores {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .score-item {
+            text-align: center;
+        }
+
+        .score-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #00ff88;
+        }
+
+        .score-label {
+            font-size: 11px;
+            color: #9ca3af;
+            text-transform: uppercase;
+            font-weight: 500;
+        }
+
+        .project-description {
+            font-size: 14px;
+            color: #d0d0d0;
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+
+        .project-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            background: rgba(0, 255, 136, 0.2);
+            color: #86efac;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .tag.strategy { background: rgba(34, 197, 94, 0.2); color: #86efac; }
+        .tag.category { background: rgba(251, 191, 36, 0.2); color: #fde68a; }
+
+        /* Tooltip */
+        .tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            pointer-events: none;
+            z-index: 100;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            max-width: 250px;
+        }
+
+        .tooltip h4 {
+            margin-bottom: 6px;
+            color: #00ff88;
+        }
+
+        /* Project Details Modal */
+        .project-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .project-modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #1a1a1a;
+            border: 2px solid #333;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 30px;
+            position: relative;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: #999;
+            font-size: 24px;
+            cursor: pointer;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .modal-close:hover {
+            color: #ff4444;
+            background: rgba(255, 68, 68, 0.1);
+        }
+
+        .modal-header {
+            border-bottom: 2px solid #333;
+            padding-bottom: 20px;
+            margin-bottom: 25px;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            color: #00ff88;
+            margin-bottom: 10px;
+            line-height: 1.3;
+        }
+
+        .modal-meta {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            font-size: 14px;
+            color: #999;
+        }
+
+        .modal-body {
+            color: #e0e0e0;
+            line-height: 1.6;
+        }
+
+        .modal-body h2, .modal-body h3 {
+            color: #00ff88;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        .modal-body h2 {
+            font-size: 20px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 8px;
+        }
+
+        .modal-body h3 {
+            font-size: 16px;
+        }
+
+        .modal-body p {
+            margin-bottom: 15px;
+        }
+
+        .modal-body ul, .modal-body ol {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        .modal-body li {
+            margin-bottom: 8px;
+        }
+
+        .modal-body strong {
+            color: #fff;
+        }
+
+        .modal-body table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .modal-body th,
+        .modal-body td {
+            border: 1px solid #333;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .modal-body th {
+            background: #2a2a2a;
+            color: #00ff88;
+            font-weight: 600;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from { 
+                opacity: 0;
+                transform: translateY(-50px) scale(0.95);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .main-container {
+                grid-template-columns: 250px 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .sidebar {
+                order: 2;
+            }
+            
+            .risk-value-matrix {
+                height: 400px;
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <div class="analytics-container">
+        <header class="analytics-header">
+            <div class="header-content">
+                <div>
+                    <h1>🤖 AI Project Portfolio Analytics</h1>
+                    <p class="subtitle">Risk/Value Analysis and Project Portfolio Management</p>
+                </div>
+                <div class="header-navigation">
+                    <button class="nav-button" onclick="openProjectBuilder()">
+                        <span>📝</span> Create New Project
+                    </button>
+                    <button class="nav-button secondary" onclick="refreshPortfolio()">
+                        <span>🔄</span> Refresh
+                    </button>
+                </div>
+            </div>
+        </header>
+
+    <div class="main-container">
+        <!-- Sidebar Controls -->
+        <div class="sidebar">
+            <div class="control-section">
+                <h3>Portfolio Overview</h3>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number" id="total-projects">0</div>
+                        <div class="stat-label">Total Projects</div>
+                    </div>
+                </div>
+                <div style="margin-top: 15px; padding: 12px; background: rgba(0, 255, 136, 0.1); border: 1px solid rgba(0, 255, 136, 0.3); border-radius: 6px; font-size: 12px; color: #86efac;">
+                    <strong>📚 Calibration Examples</strong><br>
+                    Projects marked "[Example]" are provided for scoring calibration across all priority levels and risk/value quadrants.
+                </div>
+            </div>
+
+            <div class="control-section">
+                <h3>Filter by Priority</h3>
+                <div class="filter-group">
+                    <div class="filter-checkbox">
+                        <input type="checkbox" id="priority-1" checked>
+                        <span>Priority 1 <span class="priority-badge priority-1">HIGH VALUE / LOW RISK</span></span>
+                    </div>
+                    <div class="filter-checkbox">
+                        <input type="checkbox" id="priority-2" checked>
+                        <span>Priority 2 <span class="priority-badge priority-2">HIGH VALUE / MED RISK</span></span>
+                    </div>
+                    <div class="filter-checkbox">
+                        <input type="checkbox" id="priority-3" checked>
+                        <span>Priority 3 <span class="priority-badge priority-3">MED VALUE / LOW RISK</span></span>
+                    </div>
+                    <div class="filter-checkbox">
+                        <input type="checkbox" id="priority-4" checked>
+                        <span>Priority 4 <span class="priority-badge priority-4">LOW VALUE / HIGH RISK</span></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="control-section">
+                <h3>Filter by Strategy</h3>
+                <div class="filter-group">
+                    <div class="filter-checkbox">
+                        <input type="checkbox" id="strategy-1" checked>
+                        <span>Direct Prompting</span>
+                    </div>
+                    <div class="filter-checkbox">
+                        <input type="checkbox" id="strategy-2" checked>
+                        <span>Formalized Assets</span>
+                    </div>
+                    <div class="filter-checkbox">
+                        <input type="checkbox" id="strategy-3" checked>
+                        <span>Live Production</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="control-section">
+                <h3>Filter by Category</h3>
+                <div class="filter-group">
+                    <div class="filter-checkbox">
+                        <input type="checkbox" id="cat-content" checked>
+                        <span>Content Generation</span>
+                    </div>
+                    <div class="filter-checkbox">
+                        <input type="checkbox" id="cat-classification" checked>
+                        <span>Classification</span>
+                    </div>
+                    <div class="filter-checkbox">
+                        <input type="checkbox" id="cat-search" checked>
+                        <span>Search & Retrieval</span>
+                    </div>
+                    <div class="filter-checkbox">
+                        <input type="checkbox" id="cat-extraction" checked>
+                        <span>Data Extraction</span>
+                    </div>
+                    <div class="filter-checkbox">
+                        <input type="checkbox" id="cat-conversational" checked>
+                        <span>Conversational</span>
+                    </div>
+                    <div class="filter-checkbox">
+                        <input type="checkbox" id="cat-code" checked>
+                        <span>Code & Technical</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Analytics Area -->
+        <div class="analytics-area">
+            <!-- 4-Quadrant Risk/Value Matrix -->
+            <div class="quadrant-container">
+                <div class="quadrant-header">
+                    <h2>Risk/Value Portfolio Matrix</h2>
+                    <p>Projects positioned by risk score (x-axis) and value score (y-axis)</p>
+                </div>
+                
+                <div class="risk-value-matrix" id="risk-value-matrix">
+                    <!-- Quadrant Labels -->
+                    <div class="quadrant-label high-value-low-risk">High Value / Low Risk<br><strong>Priority 1</strong></div>
+                    <div class="quadrant-label high-value-high-risk">High Value / High Risk<br><strong>Priority 2</strong></div>
+                    <div class="quadrant-label low-value-low-risk">Low Value / Low Risk<br><strong>Priority 3</strong></div>
+                    <div class="quadrant-label low-value-high-risk">Low Value / High Risk<br><strong>Priority 4</strong></div>
+                    
+                    <!-- Axis Lines -->
+                    <div class="axis-line vertical"></div>
+                    <div class="axis-line horizontal"></div>
+                    
+                    <!-- Axis Labels -->
+                    <div class="axis-label x-axis">Risk Score</div>
+                    <div class="axis-label y-axis">Value Score</div>
+                    <div class="axis-label x-low">Low Risk</div>
+                    <div class="axis-label x-high">High Risk</div>
+                    <div class="axis-label y-low">Low Value</div>
+                    <div class="axis-label y-high">High Value</div>
+                </div>
+            </div>
+
+            <!-- Project List -->
+            <div class="project-list-container">
+                <div class="project-list-header">
+                    <h3>Project Portfolio</h3>
+                    <div class="sort-controls">
+                        <label for="sort-by">Sort by:</label>
+                        <select id="sort-by">
+                            <option value="score">Final Score</option>
+                            <option value="priority">Priority Level</option>
+                            <option value="value">Value Score</option>
+                            <option value="risk">Risk Score</option>
+                            <option value="name">Project Name</option>
+                            <option value="date">Date Created</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="project-list">
+                    <!-- Projects will be populated here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Tooltip -->
+        <div class="tooltip" id="tooltip" style="display: none;">
+            <h4 id="tooltip-title"></h4>
+            <div id="tooltip-content"></div>
+        </div>
+
+        <!-- Project Details Modal -->
+        <div class="project-modal" id="project-modal">
+            <div class="modal-content">
+                <button class="modal-close" id="modal-close">&times;</button>
+                <div class="modal-header">
+                    <h2 class="modal-title" id="modal-title"></h2>
+                    <div class="modal-meta" id="modal-meta"></div>
+                </div>
+                <div class="modal-body" id="modal-body"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Project data loaded from API
+        let allProjects = [];
+        let filteredProjects = [];
+        
+        // API Configuration - dynamically determine port
+        let API_BASE_URL = 'http://localhost:8100/api'; // Default
+        
+        // Function to get the actual server port
+        async function getServerPort() {
+            try {
+                // Try to read port info from the server
+                const response = await fetch('/api/health');
+                if (response.ok) {
+                    // We're being served by the server, use relative URLs
+                    API_BASE_URL = '/api';
+                    return true;
+                }
+            } catch (e) {
+                // Not being served by the server, try different ports
+            }
+            
+            // Try common ports
+            const portsToTry = [8100, 8101, 8102, 8103, 8104, 8105];
+            
+            for (const port of portsToTry) {
+                try {
+                    const testUrl = `http://localhost:${port}/api/health`;
+                    const response = await fetch(testUrl);
+                    if (response.ok) {
+                        API_BASE_URL = `http://localhost:${port}/api`;
+                        console.log(`🔍 Found server on port ${port}`);
+                        return true;
+                    }
+                } catch (e) {
+                    // Port not available, continue
+                }
+            }
+            
+            console.warn('⚠️ Could not find server on any expected port');
+            return false;
+        }
+        
+        // Load projects from API
+        async function loadProjectsFromAPI() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/projects`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                
+                if (data.success) {
+                    allProjects = data.projects.map(project => ({
+                        id: project.id,
+                        name: project.name,
+                        description: project.description,
+                        strategy: project.strategy,
+                        category: project.category,
+                        riskScore: project.riskScore,
+                        valueScore: project.valueScore,
+                        finalScore: project.finalScore,
+                        priority: project.priority,
+                        submitter: project.submitter,
+                        department: project.department,
+                        date: project.date
+                    }));
+                    
+                    filteredProjects = [...allProjects];
+                    console.log(`✅ Loaded ${allProjects.length} projects from API`);
+                    return true;
+                } else {
+                    throw new Error(data.error || 'Failed to load projects');
+                }
+            } catch (error) {
+                console.warn('⚠️ Failed to load projects from API:', error.message);
+                console.log('📋 Using fallback sample data');
+                
+                // Fallback to sample data if API is not available
+                allProjects = [
+                    {
+                        id: "20250117_exotic_trades_mapping_pipeline",
+                        name: "Intelligent Exotic Trades Mapping Pipeline",
+                        description: "AI-powered data pipeline for automatically maintaining schema mappings between complex exotic products trading desk and simplified liquidity/capital requirements domain model.",
+                        strategy: "Strategy 2: Formalized Assets",
+                        category: "Data Extraction",
+                        riskScore: 2.7,
+                        valueScore: 3.9,
+                        finalScore: 0.92,
+                        priority: 2,
+                        submitter: "Data Architecture Team",
+                        department: "Risk Management",
+                        date: "2025-01-17"
+                    },
+                    {
+                        id: "20250115_customer_support_classification",
+                        name: "Customer Support Ticket Classification",
+                        description: "Automatically classify and route customer support tickets using NLP for urgency and department routing.",
+                        strategy: "Strategy 3: Live Production",
+                        category: "Classification",
+                        riskScore: 3.2,
+                        valueScore: 4.1,
+                        finalScore: 1.18,
+                        priority: 2,
+                        submitter: "Customer Success Team",
+                        department: "Customer Operations",
+                        date: "2025-01-15"
+                    },
+                    {
+                        id: "20250114_knowledge_base_assistant",
+                        name: "Internal Knowledge Base Assistant",
+                        description: "ChatGPT-style interface for company policies and procedures with natural language search.",
+                        strategy: "Strategy 2: Formalized Assets",
+                        category: "Search & Retrieval",
+                        riskScore: 2.1,
+                        valueScore: 4.3,
+                        finalScore: 1.74,
+                        priority: 1,
+                        submitter: "HR Technology Team",
+                        department: "Human Resources",
+                        date: "2025-01-14"
+                    },
+                    {
+                        id: "20250116_marketing_copy_generation",
+                        name: "Marketing Copy Generation Tool",
+                        description: "Generate product descriptions and marketing materials using direct LLM prompting.",
+                        strategy: "Strategy 1: Direct Prompting",
+                        category: "Content Generation",
+                        riskScore: 1.8,
+                        valueScore: 3.2,
+                        finalScore: 1.20,
+                        priority: 3,
+                        submitter: "Marketing Team",
+                        department: "Marketing",
+                        date: "2025-01-16"
+                    },
+                    {
+                        id: "20250113_code_review_assistant",
+                        name: "Code Review Assistant",
+                        description: "Real-time code review system with automatic feedback and security vulnerability detection.",
+                        strategy: "Strategy 3: Live Production",
+                        category: "Code & Technical",
+                        riskScore: 4.1,
+                        valueScore: 4.0,
+                        finalScore: 0.76,
+                        priority: 2,
+                        submitter: "Development Team",
+                        department: "Engineering",
+                        date: "2025-01-13"
+                    }
+                ];
+                
+                filteredProjects = [...allProjects];
+                return false;
+            }
+        }
+
+        // Initialize dashboard
+        async function initializeDashboard() {
+            // Show loading message
+            document.getElementById('project-list').innerHTML = '<div style="text-align: center; color: #aaa; padding: 20px;">Loading projects...</div>';
+            
+            // Load projects from API
+            await loadProjectsFromAPI();
+            
+            // Initialize dashboard components
+            updateStats();
+            renderMatrix();
+            renderProjectList();
+            setupEventListeners();
+        }
+
+        // Update portfolio statistics
+        function updateStats() {
+            document.getElementById('total-projects').textContent = filteredProjects.length;
+        }
+
+        // Render the risk/value matrix with project dots
+        function renderMatrix() {
+            const matrix = document.getElementById('risk-value-matrix');
+            
+            // Clear existing dots
+            const existingDots = matrix.querySelectorAll('.project-dot');
+            existingDots.forEach(dot => dot.remove());
+
+            filteredProjects.forEach(project => {
+                const dot = document.createElement('div');
+                dot.className = `project-dot priority-${project.priority}`;
+                dot.dataset.projectId = project.id;
+                
+                // Position dot based on actual risk (x) and value (y) score ranges
+                // Risk: Map actual range to 0-100% left position
+                // Value: Map actual range to 100-0% top position (inverted for chart)
+                
+                // Calculate dynamic ranges from current data
+                const riskMin = 0.8, riskMax = 2.5;  // Allow some headroom
+                const valueMin = 1.5, valueMax = 3.0; // Allow some headroom
+                
+                const xPercent = ((project.riskScore - riskMin) / (riskMax - riskMin)) * 90 + 5; // 5% margin
+                const yPercent = 95 - ((project.valueScore - valueMin) / (valueMax - valueMin)) * 90; // Inverted and with margin
+                
+                dot.style.left = `${xPercent}%`;
+                dot.style.top = `${yPercent}%`;
+                
+                matrix.appendChild(dot);
+            });
+        }
+
+        // Render the project list
+        function renderProjectList() {
+            const listContainer = document.getElementById('project-list');
+            listContainer.innerHTML = '';
+
+            filteredProjects.forEach(project => {
+                const projectItem = document.createElement('div');
+                projectItem.className = 'project-item';
+                projectItem.innerHTML = `
+                    <div class="project-item-header">
+                        <div>
+                            <div class="project-title">${project.name}</div>
+                            <div class="project-meta">${project.submitter} • ${project.department} • ${project.date}</div>
+                        </div>
+                        <span class="priority-badge priority-${project.priority}">Priority ${project.priority}</span>
+                    </div>
+                    <div class="project-scores">
+                        <div class="score-item">
+                            <div class="score-value">${project.finalScore.toFixed(2)}</div>
+                            <div class="score-label">Final Score</div>
+                        </div>
+                        <div class="score-item">
+                            <div class="score-value">${project.valueScore.toFixed(1)}</div>
+                            <div class="score-label">Value</div>
+                        </div>
+                        <div class="score-item">
+                            <div class="score-value">${project.riskScore.toFixed(1)}</div>
+                            <div class="score-label">Risk</div>
+                        </div>
+                    </div>
+                    <div class="project-description">${project.description}</div>
+                    <div class="project-tags">
+                        <span class="tag strategy">${project.strategy}</span>
+                        <span class="tag category">${project.category}</span>
+                    </div>
+                `;
+                listContainer.appendChild(projectItem);
+            });
+        }
+
+        // Apply filters based on selected checkboxes
+        function applyFilters() {
+            filteredProjects = allProjects.filter(project => {
+                // Priority filters
+                const priorityChecked = document.getElementById(`priority-${project.priority}`).checked;
+                if (!priorityChecked) return false;
+
+                // Strategy filters
+                const strategyMap = {
+                    'Strategy 1: Direct Prompting': 'strategy-1',
+                    'Strategy 2: Formalized Assets': 'strategy-2',
+                    'Strategy 3: Live Production': 'strategy-3'
+                };
+                const strategyChecked = document.getElementById(strategyMap[project.strategy]).checked;
+                if (!strategyChecked) return false;
+
+                // Category filters
+                const categoryMap = {
+                    'Content Generation': 'cat-content',
+                    'Classification': 'cat-classification',
+                    'Search & Retrieval': 'cat-search',
+                    'Data Extraction': 'cat-extraction',
+                    'Conversational': 'cat-conversational',
+                    'Code & Technical': 'cat-code'
+                };
+                const categoryChecked = document.getElementById(categoryMap[project.category]).checked;
+                if (!categoryChecked) return false;
+
+                return true;
+            });
+
+            updateStats();
+            renderMatrix();
+            renderProjectList();
+        }
+
+        // Sort projects based on selected option
+        function sortProjects() {
+            const sortBy = document.getElementById('sort-by').value;
+            
+            filteredProjects.sort((a, b) => {
+                switch (sortBy) {
+                    case 'score':
+                        return b.finalScore - a.finalScore;
+                    case 'priority':
+                        return a.priority - b.priority;
+                    case 'value':
+                        return b.valueScore - a.valueScore;
+                    case 'risk':
+                        return a.riskScore - b.riskScore;
+                    case 'name':
+                        return a.name.localeCompare(b.name);
+                    case 'date':
+                        return new Date(b.date) - new Date(a.date);
+                    default:
+                        return 0;
+                }
+            });
+
+            renderProjectList();
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Filter checkboxes
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', applyFilters);
+            });
+
+            // Sort dropdown
+            document.getElementById('sort-by').addEventListener('change', sortProjects);
+
+            // Tooltip for matrix dots
+            const matrix = document.getElementById('risk-value-matrix');
+            const tooltip = document.getElementById('tooltip');
+
+            matrix.addEventListener('mouseover', (e) => {
+                if (e.target.classList.contains('project-dot')) {
+                    const projectId = e.target.dataset.projectId;
+                    const project = allProjects.find(p => p.id === projectId);
+                    
+                    document.getElementById('tooltip-title').textContent = project.name;
+                    document.getElementById('tooltip-content').innerHTML = `
+                        <div><strong>Final Score:</strong> ${project.finalScore.toFixed(2)}</div>
+                        <div><strong>Value Score:</strong> ${project.valueScore.toFixed(1)}</div>
+                        <div><strong>Risk Score:</strong> ${project.riskScore.toFixed(1)}</div>
+                        <div><strong>Priority:</strong> ${project.priority}</div>
+                        <div><strong>Category:</strong> ${project.category}</div>
+                        <div><strong>Strategy:</strong> ${project.strategy}</div>
+                    `;
+                    
+                    tooltip.style.display = 'block';
+                }
+            });
+
+            matrix.addEventListener('mousemove', (e) => {
+                if (e.target.classList.contains('project-dot')) {
+                    tooltip.style.left = e.pageX + 10 + 'px';
+                    tooltip.style.top = e.pageY - 50 + 'px';
+                }
+            });
+
+            matrix.addEventListener('mouseout', (e) => {
+                if (e.target.classList.contains('project-dot')) {
+                    tooltip.style.display = 'none';
+                }
+            });
+
+            // Double-click to show project details
+            matrix.addEventListener('dblclick', (e) => {
+                if (e.target.classList.contains('project-dot')) {
+                    const projectId = e.target.dataset.projectId;
+                    showProjectModal(projectId);
+                }
+            });
+
+            // Modal close event listeners
+            const modal = document.getElementById('project-modal');
+            const modalClose = document.getElementById('modal-close');
+            
+            // Close modal when clicking the close button
+            modalClose.addEventListener('click', hideProjectModal);
+            
+            // Close modal when clicking outside the content
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    hideProjectModal();
+                }
+            });
+            
+            // Close modal with Escape key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && modal.classList.contains('show')) {
+                    hideProjectModal();
+                }
+            });
+        }
+
+        // Show project details modal
+        async function showProjectModal(projectId) {
+            const modal = document.getElementById('project-modal');
+            const modalTitle = document.getElementById('modal-title');
+            const modalMeta = document.getElementById('modal-meta');
+            const modalBody = document.getElementById('modal-body');
+            
+            // Find project in our data
+            const project = allProjects.find(p => p.id === projectId);
+            if (!project) {
+                console.error('Project not found:', projectId);
+                return;
+            }
+            
+            // Set loading state
+            modalTitle.textContent = project.name;
+            modalMeta.innerHTML = `
+                <span><strong>Priority:</strong> ${project.priority}</span>
+                <span><strong>Score:</strong> ${project.finalScore.toFixed(2)}</span>
+                <span><strong>Department:</strong> ${project.department}</span>
+                <span><strong>Date:</strong> ${project.date}</span>
+            `;
+            modalBody.innerHTML = '<div style="text-align: center; color: #aaa; padding: 40px;">Loading project details...</div>';
+            
+            // Show modal
+            modal.classList.add('show');
+            
+            // Load full project content from API
+            try {
+                const response = await fetch(`${API_BASE_URL}/projects/${projectId}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                
+                if (data.success && data.project.fullContent) {
+                    // Convert markdown-like content to HTML
+                    const htmlContent = convertMarkdownToHtml(data.project.fullContent);
+                    modalBody.innerHTML = htmlContent;
+                } else {
+                    throw new Error('Full content not available');
+                }
+            } catch (error) {
+                console.error('Error loading project details:', error);
+                modalBody.innerHTML = `
+                    <div style="color: #ff6b6b; text-align: center; padding: 20px;">
+                        <h3>Unable to load full project details</h3>
+                        <p>Error: ${error.message}</p>
+                        <p>Showing available summary data:</p>
+                    </div>
+                    <div style="margin-top: 20px;">
+                        <h3>Project Summary</h3>
+                        <p><strong>Description:</strong> ${project.description}</p>
+                        <p><strong>Strategy:</strong> ${project.strategy}</p>
+                        <p><strong>Category:</strong> ${project.category}</p>
+                        <p><strong>Risk Score:</strong> ${project.riskScore}</p>
+                        <p><strong>Value Score:</strong> ${project.valueScore}</p>
+                        <p><strong>Final Score:</strong> ${project.finalScore}</p>
+                        <p><strong>Submitter:</strong> ${project.submitter}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Hide project details modal
+        function hideProjectModal() {
+            const modal = document.getElementById('project-modal');
+            modal.classList.remove('show');
+        }
+
+        // Simple markdown to HTML converter for project content
+        function convertMarkdownToHtml(markdown) {
+            let html = markdown
+                // Headers
+                .replace(/^### (.*$)/gm, '<h3>$1</h3>')
+                .replace(/^## (.*$)/gm, '<h2>$1</h2>')
+                .replace(/^# (.*$)/gm, '<h1>$1</h1>')
+                // Bold text
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                // Lists
+                .replace(/^\- (.*$)/gm, '<li>$1</li>')
+                .replace(/^(\d+)\. (.*$)/gm, '<li>$2</li>')
+                // Wrap consecutive list items
+                .replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>')
+                // Paragraphs
+                .replace(/\n\n/g, '</p><p>')
+                .replace(/^(?!<[h1-6]|<ul|<ol|<li|<table|<div)/gm, '<p>')
+                .replace(/(?<!>)$/gm, '</p>')
+                // Clean up empty paragraphs
+                .replace(/<p><\/p>/g, '')
+                .replace(/<p>(<[h1-6])/g, '$1')
+                .replace(/(<\/[h1-6]>)<\/p>/g, '$1');
+            
+            return html;
+        }
+
+        // Navigation functions
+        function openProjectBuilder() {
+            // Open project builder in new tab so user can keep portfolio open
+            window.open('project_builder_app.html', '_blank');
+        }
+
+        function refreshPortfolio() {
+            // Reload the current data from API
+            initializeDashboard();
+        }
+
+        // Initialize dashboard on page load
+        document.addEventListener('DOMContentLoaded', initializeDashboard);
+    </script>
+</body>
+</html>
