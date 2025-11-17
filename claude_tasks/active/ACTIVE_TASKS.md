@@ -1,13 +1,25 @@
 # Active Tasks
 
 ## Current Sprint
-*Last Updated: 2025-08-19*
+*Last Updated: 2025-08-22*
 
 ---
 
 ## Task Queue
 
-*No active tasks - system is in maintenance mode*
+### Task 1
+- **ID**: 1
+- **Priority**: High
+- **Status**: Not Started
+- **Estimated Time**: 4 hours
+- **Dependencies**: None
+- **Description**: Critical functionality restoration - React app missing core features from unified_project_dashboard.html including local storage, evaluation calculator, and project builder
+- **Acceptance Criteria**:
+  - [ ] Analysis of missing functionality completed
+  - [ ] Decision made on HTML restoration vs React rebuild
+  - [ ] Core evaluation calculator restored
+  - [ ] Local project storage implemented
+  - [ ] Project builder form functional
 
 ### Task Template (for reference)
 - **ID**: N

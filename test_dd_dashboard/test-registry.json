@@ -1,0 +1,66 @@
+{
+  "component": [
+    {
+      "file": "widget.test.html",
+      "relativePath": "component/widget.test.html",
+      "directory": "component",
+      "fullPath": "/Users/jim/src/apps/test_dd_dashboard/component/widget.test.html",
+      "projectRoot": "/Users/jim/src/apps/test_dd_dashboard"
+    }
+  ],
+  "integration": [
+    {
+      "file": "workflow.test.py",
+      "relativePath": "integration/workflow.test.py",
+      "directory": "integration",
+      "fullPath": "/Users/jim/src/apps/test_dd_dashboard/integration/workflow.test.py",
+      "projectRoot": "/Users/jim/src/apps/test_dd_dashboard"
+    }
+  ],
+  "tests": [
+    {
+      "file": "category-select-all-filter.test.js",
+      "relativePath": "tests/category-select-all-filter.test.js",
+      "directory": "tests",
+      "fullPath": "/Users/jim/src/apps/test_dd_dashboard/tests/category-select-all-filter.test.js",
+      "projectRoot": "/Users/jim/src/apps/test_dd_dashboard"
+    },
+    {
+      "file": "edge-cases.test.js",
+      "relativePath": "tests/edge-cases.test.js",
+      "directory": "tests",
+      "fullPath": "/Users/jim/src/apps/test_dd_dashboard/tests/edge-cases.test.js",
+      "projectRoot": "/Users/jim/src/apps/test_dd_dashboard"
+    },
+    {
+      "file": "localstorage-isolation-browser.test.html",
+      "relativePath": "tests/localstorage-isolation-browser.test.html",
+      "directory": "tests",
+      "fullPath": "/Users/jim/src/apps/test_dd_dashboard/tests/localstorage-isolation-browser.test.html",
+      "projectRoot": "/Users/jim/src/apps/test_dd_dashboard"
+    },
+    {
+      "file": "localstorage-isolation.test.js",
+      "relativePath": "tests/localstorage-isolation.test.js",
+      "directory": "tests",
+      "fullPath": "/Users/jim/src/apps/test_dd_dashboard/tests/localstorage-isolation.test.js",
+      "projectRoot": "/Users/jim/src/apps/test_dd_dashboard"
+    },
+    {
+      "file": "master-selection.test.js",
+      "relativePath": "tests/master-selection.test.js",
+      "directory": "tests",
+      "fullPath": "/Users/jim/src/apps/test_dd_dashboard/tests/master-selection.test.js",
+      "projectRoot": "/Users/jim/src/apps/test_dd_dashboard"
+    }
+  ],
+  "unit": [
+    {
+      "file": "math.test.js",
+      "relativePath": "unit/math.test.js",
+      "directory": "unit",
+      "fullPath": "/Users/jim/src/apps/test_dd_dashboard/unit/math.test.js",
+      "projectRoot": "/Users/jim/src/apps/test_dd_dashboard"
+    }
+  ]
+}
